@@ -1,12 +1,11 @@
 import pygame
 import subprocess
 import json
-import numpy
 import os
 #create gui canvas
 BLACK = (255,255,255)
-resolutionWidth = 1920 
-resolutionHight = 1080 
+resolutionWidth = 1600 
+resolutionHight = 900 
 
 pygame.init()
 FPS = 60
@@ -86,27 +85,34 @@ class Selection:
     def move(self, option):
         numberOfLines = len(self.appLayout)
         numberOfAppsInRow = len(self.appLayout[self.selectionGrid[1]])
-        print(self.selectionGrid)
-        if option == 'RIGHT':
+        if option == 'LEFT':
             if numberOfAppsInRow == self.selectionGrid[0] + 1:
-                self.selectionGrid[0] = -numberOfAppsInRow
+                self.selectionGrid[0] = 0 
             else:
                 self.selectionGrid[0] += 1
-        if option == 'LEFT':
-            if -numberOfAppsInRow >= self.selectionGrid[0]:
-                self.selectionGrid[0] = -1 
+        if option == 'RIGHT':
+            if 0 == self.selectionGrid[0]:
+                self.selectionGrid[0] = numberOfAppsInRow -1 
             else:
                 self.selectionGrid[0] -= 1
         if option == 'UP':
-            if self.selectionGrid[1] == 0 or self.selectionGrid[1] == -numberOfLines:
-                self.selectionGrid[1] = -1
+            if self.selectionGrid[1] == 0:
+                self.selectionGrid[1] = numberOfLines -1 
             else:
-                self.selectionGrid[1] += 1
+                self.selectionGrid[1] -= 1
+
         if option == 'DOWN':
-            if numberOfLines == self.selectionGrid[1] + 1:
+            if self.selectionGrid[1] == numberOfLines -1:
                 self.selectionGrid[1] = 0
             else:
-                self.selectionGrid[1] += 1 
+                self.selectionGrid[1] += 1
+        #update numberOfAppsInRow with the adjust before checking agian.betterway? 
+        numberOfAppsInRow = len(self.appLayout[self.selectionGrid[1]])
+        if numberOfAppsInRow - 1 <= self.selectionGrid[0]:
+            self.selectionGrid[0] = numberOfAppsInRow - 1
+        
+
+        
         nextApp = self.appLayout[self.selectionGrid[1]][self.selectionGrid[0]]
 
         self.selectionRect.x, self.selectionRect.y = nextApp.buttonRect.x, nextApp.buttonRect.y 
@@ -117,7 +123,7 @@ class Apps:
         self.appsFile = appsFile
         self.appLayout = [[]]
         self.hightAdjustment = resolutionHight * .010 
-        self.widthAdjustment = resolutionWidth * 1.52
+        self.widthAdjustment = resolutionWidth * .85
         self.lineNumber = 0
     def importApps(self):
         with open(self.appsFile, 'r') as apps:
@@ -129,14 +135,13 @@ class Apps:
                 newButton.cmd = app['cmd']
                 self.appLayout[self.lineNumber].append(newButton)
                 #after button is appended it adjusts the location 
-                if self.widthAdjustment < (resolutionWidth * .80):
+                if self.widthAdjustment < (resolutionWidth * .50):
                      self.lineNumber += 1
                      self.appLayout.append([])
                      self.hightAdjustment += self.hightAdjustment + 256
-                     self.widthAdjustment = resolutionWidth * 1.52
+                     self.widthAdjustment = resolutionWidth * .85
                 else:
                      self.widthAdjustment += -266
-                print(newButton.x, newButton.y)
             return self.appLayout
     def displayApps(self):
         for line in self.appLayout:
