@@ -1,0 +1,34 @@
+{
+  "apps" : [
+    {
+        "name" : "LibreWolf",
+        "image" : "./Images/librewolf.png",
+        "cmd": "librewolf"
+    },
+    { 
+      "name" : "DailyWire", 
+      "image": "./Images/dailywire256.jpg", 
+      "cmd" : "librewolf"
+    },
+    { 
+      "name" : "DailyWire", 
+      "image": "./Images/dailywire256.jpg", 
+      "cmd" : "librewolf"
+    },
+    { 
+      "name" : "DailyWire", 
+      "image": "./Images/dailywire256.jpg", 
+      "cmd" : "librewolf"
+    },
+    { 
+      "name" : "BentKey", 
+      "image": "./Images/bent_key.png", 
+      "cmd" : "librewolf"
+    },
+    { 
+      "name" : "BentKey", 
+      "image": "./Images/bent_key.png", 
+      "cmd" : "librewolf"
+    }
+  ]
+}
