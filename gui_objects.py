@@ -2,15 +2,20 @@ import pygame
 import subprocess
 import json
 import numpy
-
+import os
 #create gui canvas
 BLACK = (255,255,255)
-resolutionHight = 1920    
-resolutionWidth = 1080
+resolutionWidth = 1920 
+resolutionHight = 1080 
 
+pygame.init()
 FPS = 60
 Music_Switch= False
-gui_canvas = pygame.display.set_mode((resolutionHight,resolutionWidth))
+
+os.environ['SDL_VIDEO_CENTERED'] = '1'
+info = pygame.display.Info()
+#resolutionWidth, resolutionHight = info.current_w, info.current_h
+canvas = pygame.display.set_mode((resolutionWidth, resolutionHight), pygame.RESIZABLE)
 
 
 class Button:
@@ -38,11 +43,11 @@ class Button:
       def display(self):
           mousePos = pygame.mouse.get_pos()
           if self.buttonRect.collidepoint(mousePos):
-              gui_canvas.blit(self.font_rendered_highlighted, self.buttonRect)
+              canvas.blit(self.font_rendered_highlighted, self.buttonRect)
           else:
-              gui_canvas.blit(self.font_rendered, self.buttonRect)
+              canvas.blit(self.font_rendered, self.buttonRect)
       def displayImage(self):
-           gui_canvas.blit(self.buttonImage, self.buttonRect)
+           canvas.blit(self.buttonImage, self.buttonRect)
       def process(self):
           mousePos = pygame.mouse.get_pos()
           if self.buttonRect.collidepoint(mousePos):
@@ -70,7 +75,7 @@ class Selection:
     
     def displayImage(self):
         #selectionCanvas.blit(self.selectionImage, self.selectionRect)
-        pygame.draw.rect(gui_canvas, (255,255,255), self.selectionRect)
+        pygame.draw.rect(canvas, (255,255,255), self.selectionRect)
     def yContraint(self):
         y = self.selectionGrid[1]
         numberOfLines = len(self.appLayout)
@@ -173,7 +178,7 @@ class menu:
         self.exit_game = Button(self.x +150, self.y + 90, "Exit Game")
     def display(self):
         if self.is_open:
-            gui_canvas.blit(self.image, self.rect)
+            canvas.blit(self.image, self.rect)
             self.start_stop_music.display()
             self.exit_game.display()
             for e in pygame.event.get():

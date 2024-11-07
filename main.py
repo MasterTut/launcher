@@ -2,11 +2,8 @@
 import pygame 
 import sys
 import gui_objects
-import os
-#Setup
-pygame.init()
-os.environ['SDL_VIDEO_WINDOW_POS'] = "100, 100"
-canvas = pygame.display.set_mode((gui_objects.resolutionHight, gui_objects.resolutionWidth))
+#setup
+canvas = gui_objects.canvas 
 pygame.display.set_caption("GameLauncher")
 clock = pygame.time.Clock()
 
