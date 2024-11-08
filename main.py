@@ -4,7 +4,7 @@ import sys
 import gui_objects
 #setup
 canvas = gui_objects.canvas
-canvas.fill((105, 105, 105))
+canvas.fill((30, 30, 30))
 pygame.display.set_caption("GameLauncher")
 clock = pygame.time.Clock()
 #Import Images 
@@ -15,13 +15,12 @@ background_position = (0, 0)
 font = pygame.font.Font('./Font/VarinonormalRegular-1GXaM.ttf', 20)
 
 #setup GUI 
-mediaButton = gui_objects.Button(100,40, "Media") 
-sideMenu = pygame.Surface((200,gui_objects.resolutionHeight))
-sideMenu.fill((50,10,0))
-appsMenu = pygame.Surface((gui_objects.resolutionWidth * .8,gui_objects.resolutionHeight *.9))
-print(canvas.get_height())
-#appsMenu.fill((0,20,0))
+mediaButton = gui_objects.Button(100,40, "Media")
+sideMenu = pygame.Surface((200,gui_objects.resolutionHeight *.9))
+sideMenu.fill((50,50,50))
 mediaButton.surface = sideMenu
+appsMenu = pygame.Surface((gui_objects.resolutionWidth * .8,gui_objects.resolutionHeight *.9))
+appsMenu.fill((40,40,40))
 
 apps = gui_objects.Apps('./apps.json', appsMenu)
 appLayout = apps.importApps() 
@@ -66,11 +65,10 @@ def controls():
 
 def updateCanvas():
     #canvas.blit(background, dest = background_position)
-    #canvas.blit(sideMenu, (10,0))
+    canvas.blit(sideMenu, (10, 20))
     canvas.blit(appsMenu, (canvas.get_width() * .19, 20))
     apps.displayApps()
-    # sideMenu.blit(mediaButton.font_rendered, (mediaButton.x, mediaButton.y))
-    #mediaButton.display()
+    mediaButton.display()
     selection.displayImage()
     pygame.display.update()
 

@@ -94,16 +94,16 @@ class Selection:
                 self.selectionGrid[0] -= 1
         if option == 'UP':
             if self.selectionGrid[1] == 0:
-                self.selectionGrid[1] = numberOfLines -1 
+                self.selectionGrid[1] = numberOfLines -2 
             else:
                 self.selectionGrid[1] -= 1
 
         if option == 'DOWN':
-            if self.selectionGrid[1] == numberOfLines -1:
+            if self.selectionGrid[1] == numberOfLines -2:
                 self.selectionGrid[1] = 0
             else:
                 self.selectionGrid[1] += 1
-        #update numberOfAppsInRow with the adjust before checking agian.betterway? 
+        #update numberOfAppsInRow with the adjust before checking agian(betterway?) 
         numberOfAppsInRow = len(self.appLayout[self.selectionGrid[1]])
         if numberOfAppsInRow - 1 <= self.selectionGrid[0]:
             self.selectionGrid[0] = numberOfAppsInRow - 1
@@ -121,7 +121,7 @@ class Apps:
         self.appsFile = appsFile
         self.appLayout = [[]]
         self.hightAdjustment = self.displaySurface.get_height() * .010 
-        self.widthAdjustment = self.displaySurface.get_width() * .85
+        self.widthAdjustment = self.displaySurface.get_width() * .79
         self.lineNumber = 0
     def importApps(self):
         with open(self.appsFile, 'r') as apps:
@@ -139,7 +139,7 @@ class Apps:
                      self.lineNumber += 1
                      self.appLayout.append([])
                      self.hightAdjustment += self.hightAdjustment + 256
-                     self.widthAdjustment = self.displaySurface.get_width() * .85
+                     self.widthAdjustment = self.displaySurface.get_width() * .79
                 else:
                      self.widthAdjustment += -266
             return self.appLayout
