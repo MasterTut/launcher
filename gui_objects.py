@@ -16,7 +16,8 @@ os.environ['SDL_VIDEO_CENTERED'] = '1'
 info = pygame.display.Info()
 #resolutionWidth, resolutionHight = info.current_w, info.current_h
 canvas = pygame.display.set_mode((resolutionWidth, resolutionHeight), pygame.RESIZABLE)
-
+appsMenu = pygame.Surface((resolutionWidth *.8, resolutionHeight *.9))
+appsMenu.fill((40,40,40))
 
 class Button:
       def __init__(self, x, y, buttonText='Default'):
@@ -28,18 +29,18 @@ class Button:
           self.buttonImage = pygame.image.load("./Assets/testing.png")
           self.surface = canvas 
           self.cmd = "echo " + self.buttonText
+          self.isSelected = False
 
           self.fillColors = { 'normal' : '#ffffff', 'hover' : '#666666',  'pressed' : '#333333', }
 
           #self.buttonSurface = pygame.Surface((self.width, self.height))
           self.buttonRect = pygame.Rect(self.x, self.y, self.width, self.height)
-          self.font = pygame.font.Font('./Font/VarinonormalRegular-1GXaM.ttf', 18)
+          self.font = pygame.font.Font('/usr/share/fonts/TTF/JetBrainsMonoNLNerdFontPropo-Regular.ttf', 30)
           self.font_rendered = self.font.render(self.buttonText, True, (255,200,200))
           self.font_rendered_highlighted = self.font.render(self.buttonText, True, (255, 255, 200))
           self.highlighted = False
       def onclickFunction(self):
           subprocess.call(self.cmd, shell=True)
-          #override this function
       def display(self):
           mousePos = pygame.mouse.get_pos()
           if self.buttonRect.collidepoint(mousePos):
@@ -47,18 +48,26 @@ class Button:
           else:
               self.surface.blit(self.font_rendered, self.buttonRect)
       def displayImage(self):
-           self.surface.blit(self.buttonImage, self.buttonRect)
+        if self.isSelected:
+            image = pygame.transform.smoothscale(self.buttonImage, (300,300))
+            self.surface.blit(image, (self.buttonRect.x -25, self.buttonRect.y -25))
+        else:
+            self.surface.blit(self.buttonImage, self.buttonRect)
       def process(self):
           mousePos = pygame.mouse.get_pos()
           if self.buttonRect.collidepoint(mousePos):
               self.onclickFunction()
-      def processSelection(self, selection):
+      def processSelection(self, selection, option):
         selectionPos = selection.selectionRect.x, selection.selectionRect.y
         if self.buttonRect.collidepoint(selectionPos):
-            self.onclickFunction()
-      def buttonScale(self):
-        pygame.transform.scale(self.buttonImage, (55,55))
-
+            if option == 'clicked':
+                self.onclickFunction()
+            if option == 'selected':
+                self.isSelected = True
+        else:
+            self.isSelected = False
+        self.displayImage()
+                
         
             
 class Selection:
@@ -74,10 +83,8 @@ class Selection:
         self.selectionRect = pygame.Rect(self.x, self.y, self.width, self.height)
         self.selectionGrid = [0, 0]
     
-    def displayImage(self):
-        #selectionCanvas.blit(self.selectionImage, self.selectionRect)
-        pygame.draw.rect(self.displaySurface, (255,255,255), self.selectionRect)
-    
+    def moveMenu(self, option):
+        pass
 
     def move(self, option):
         numberOfLines = len(self.appLayout)
@@ -108,16 +115,20 @@ class Selection:
         if numberOfAppsInRow - 1 <= self.selectionGrid[0]:
             self.selectionGrid[0] = numberOfAppsInRow - 1
         
-
-        
         nextApp = self.appLayout[self.selectionGrid[1]][self.selectionGrid[0]]
-
-        self.selectionRect.x, self.selectionRect.y = nextApp.buttonRect.x, nextApp.buttonRect.y 
-
+        self.selectionRect.x, self.selectionRect.y = nextApp.buttonRect.x, nextApp.buttonRect.y
+        if option == 'ENTER':
+            nextApp.processSelection(self, 'clicked')
+        else:
+            nextApp.processSelection(self, 'selected')
+    #scaling image by selection maybe not need this function anymore?
+    def displayImage(self):
+        #selectionCanvas.blit(self.selectionImage, self.selectionRect)
+        pygame.draw.rect(self.displaySurface, (255,255,255), self.selectionRect)
 
 class Apps:
-    def __init__(self, appsFile, displaySurface) -> None:
-        self.displaySurface = displaySurface
+    def __init__(self, appsFile) -> None:
+        self.displaySurface = appsMenu 
         self.appsFile = appsFile
         self.appLayout = [[]]
         self.hightAdjustment = self.displaySurface.get_height() * .010 
@@ -134,14 +145,16 @@ class Apps:
                 newButton.cmd = app['cmd']
                 newButton.surface = self.displaySurface
                 self.appLayout[self.lineNumber].append(newButton)
-                #after button is appended it adjusts the location 
+                #after button is appended it adjusts the location
+                #location of apps are adjusted based on the surface area of appsMenu vs the window size
+                #the idea is more consistancy dispite window size
                 if self.widthAdjustment < (self.displaySurface.get_width() * .50):
                      self.lineNumber += 1
                      self.appLayout.append([])
-                     self.hightAdjustment += self.hightAdjustment + 256
+                     self.hightAdjustment += self.hightAdjustment + 266
                      self.widthAdjustment = self.displaySurface.get_width() * .79
                 else:
-                     self.widthAdjustment += -266
+                     self.widthAdjustment += -280
             return self.appLayout
     def displayApps(self):
         for line in self.appLayout:
@@ -150,7 +163,7 @@ class Apps:
     def processApps(self, selection):
         for line in self.appLayout:
             for button in line:
-                button.processSelection(selection)
+                button.processSelection(selection, 'selected')
     
 
 class DialogBox:

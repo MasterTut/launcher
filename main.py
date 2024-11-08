@@ -15,14 +15,13 @@ background_position = (0, 0)
 font = pygame.font.Font('./Font/VarinonormalRegular-1GXaM.ttf', 20)
 
 #setup GUI 
-mediaButton = gui_objects.Button(100,40, "Media")
+
 sideMenu = pygame.Surface((200,gui_objects.resolutionHeight *.9))
 sideMenu.fill((50,50,50))
+mediaButton = gui_objects.Button(sideMenu.get_width() * .1,40, "Media")
 mediaButton.surface = sideMenu
-appsMenu = pygame.Surface((gui_objects.resolutionWidth * .8,gui_objects.resolutionHeight *.9))
-appsMenu.fill((40,40,40))
-
-apps = gui_objects.Apps('./apps.json', appsMenu)
+appsMenu = gui_objects.appsMenu
+apps = gui_objects.Apps('./apps.json')
 appLayout = apps.importApps() 
 
 #Start Selction on the top right App            
@@ -60,16 +59,17 @@ def controls():
             if event.key == pygame.K_UP:
                 selection.move('UP') 
             if event.key == pygame.K_RETURN:
-                apps.processApps(selection)
-                print("ENTER")
+                selection.move('ENTER')
 
-def updateCanvas():
+def updateCanvas(): 
     #canvas.blit(background, dest = background_position)
     canvas.blit(sideMenu, (10, 20))
     canvas.blit(appsMenu, (canvas.get_width() * .19, 20))
-    apps.displayApps()
+
+    appsMenu.fill((40, 40, 40))
     mediaButton.display()
-    selection.displayImage()
+    apps.processApps(selection)
+    
     pygame.display.update()
 
 def gameLoop():
