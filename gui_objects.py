@@ -4,8 +4,9 @@ import json
 import os
 #create gui canvas
 BLACK = (255,255,255)
-resolutionWidth = 1600 
-resolutionHight = 900 
+
+resolutionWidth = 1920 
+resolutionHeight = 1080 
 
 pygame.init()
 FPS = 60
@@ -14,7 +15,7 @@ Music_Switch= False
 os.environ['SDL_VIDEO_CENTERED'] = '1'
 info = pygame.display.Info()
 #resolutionWidth, resolutionHight = info.current_w, info.current_h
-canvas = pygame.display.set_mode((resolutionWidth, resolutionHight), pygame.RESIZABLE)
+canvas = pygame.display.set_mode((resolutionWidth, resolutionHeight), pygame.RESIZABLE)
 
 
 class Button:
@@ -25,12 +26,12 @@ class Button:
           self.height = 256
           self.buttonText = buttonText
           self.buttonImage = pygame.image.load("./Assets/testing.png")
-            
+          self.surface = canvas 
           self.cmd = "echo " + self.buttonText
 
           self.fillColors = { 'normal' : '#ffffff', 'hover' : '#666666',  'pressed' : '#333333', }
 
-          self.buttonSurface = pygame.Surface((self.width, self.height))
+          #self.buttonSurface = pygame.Surface((self.width, self.height))
           self.buttonRect = pygame.Rect(self.x, self.y, self.width, self.height)
           self.font = pygame.font.Font('./Font/VarinonormalRegular-1GXaM.ttf', 18)
           self.font_rendered = self.font.render(self.buttonText, True, (255,200,200))
@@ -42,11 +43,11 @@ class Button:
       def display(self):
           mousePos = pygame.mouse.get_pos()
           if self.buttonRect.collidepoint(mousePos):
-              canvas.blit(self.font_rendered_highlighted, self.buttonRect)
+              self.surface.blit(self.font_rendered_highlighted, self.buttonRect)
           else:
-              canvas.blit(self.font_rendered, self.buttonRect)
+              self.surface.blit(self.font_rendered, self.buttonRect)
       def displayImage(self):
-           canvas.blit(self.buttonImage, self.buttonRect)
+           self.surface.blit(self.buttonImage, self.buttonRect)
       def process(self):
           mousePos = pygame.mouse.get_pos()
           if self.buttonRect.collidepoint(mousePos):
@@ -61,26 +62,22 @@ class Button:
         
             
 class Selection:
-    def __init__(self, appLayout) -> None:
+    def __init__(self, appLayout, displaySurface) -> None:
+        self.displaySurface = displaySurface
         self.appLayout = appLayout
         self.x = appLayout[0][0].buttonRect.x 
         self.y = appLayout[0][0].buttonRect.y 
         self.width = 255
         self.height = 255
         self.selectionImage = pygame.image.load("./Assets/testing.png")
-        self.selectionSurface = pygame.Surface((self.width, self.height))
+        # self.selectionSurface = pygame.Surface((self.width, self.height))
         self.selectionRect = pygame.Rect(self.x, self.y, self.width, self.height)
         self.selectionGrid = [0, 0]
     
     def displayImage(self):
         #selectionCanvas.blit(self.selectionImage, self.selectionRect)
-        pygame.draw.rect(canvas, (255,255,255), self.selectionRect)
-    def yContraint(self):
-        y = self.selectionGrid[1]
-        numberOfLines = len(self.appLayout)
-        numberOfAppsInRow = len(self.appLayout[self.selectionGrid[1]])
-        if numberOfLines < y > numberOfLines:
-            return True 
+        pygame.draw.rect(self.displaySurface, (255,255,255), self.selectionRect)
+    
 
     def move(self, option):
         numberOfLines = len(self.appLayout)
@@ -119,27 +116,30 @@ class Selection:
 
 
 class Apps:
-    def __init__(self, appsFile) -> None:
+    def __init__(self, appsFile, displaySurface) -> None:
+        self.displaySurface = displaySurface
         self.appsFile = appsFile
         self.appLayout = [[]]
-        self.hightAdjustment = resolutionHight * .010 
-        self.widthAdjustment = resolutionWidth * .85
+        self.hightAdjustment = self.displaySurface.get_height() * .010 
+        self.widthAdjustment = self.displaySurface.get_width() * .85
         self.lineNumber = 0
     def importApps(self):
         with open(self.appsFile, 'r') as apps:
+
             data = json.load(apps)
             for app in data['apps']:
                 newButton = Button(self.widthAdjustment, self.hightAdjustment, app['name'])
                 newButton.buttonImage = pygame.image.load(app['image'])
                 newButton.buttonImage = pygame.transform.scale(newButton.buttonImage,(256,256))
                 newButton.cmd = app['cmd']
+                newButton.surface = self.displaySurface
                 self.appLayout[self.lineNumber].append(newButton)
                 #after button is appended it adjusts the location 
-                if self.widthAdjustment < (resolutionWidth * .50):
+                if self.widthAdjustment < (self.displaySurface.get_width() * .50):
                      self.lineNumber += 1
                      self.appLayout.append([])
                      self.hightAdjustment += self.hightAdjustment + 256
-                     self.widthAdjustment = resolutionWidth * .85
+                     self.widthAdjustment = self.displaySurface.get_width() * .85
                 else:
                      self.widthAdjustment += -266
             return self.appLayout
