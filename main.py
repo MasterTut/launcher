@@ -11,21 +11,20 @@ clock = pygame.time.Clock()
 background= pygame.image.load("./Images/background.png")
 background_position = (0, 0)
 
-#setup font 
-font = pygame.font.Font('./Font/VarinonormalRegular-1GXaM.ttf', 20)
-
-#setup GUI 
-
-sideMenu = pygame.Surface((200,gui_objects.resolutionHeight *.9))
-sideMenu.fill((50,50,50))
-mediaButton = gui_objects.Button(sideMenu.get_width() * .1,40, "Media")
-mediaButton.surface = sideMenu
+#setup GUI
+sideMenuList = []
+sideMenu = gui_objects.sideMenu
+mediaButton = gui_objects.Button(gui_objects.sideMenu.get_width() * .1,40, "Media")
+mediaButton.surface = gui_objects.sideMenu
+sideMenuList.append(mediaButton)
 appsMenu = gui_objects.appsMenu
 apps = gui_objects.Apps('./apps.json')
 appLayout = apps.importApps() 
 
 #Start Selction on the top right App            
-selection = gui_objects.Selection(appLayout, appsMenu)
+selection = gui_objects.Selection(appLayout, sideMenuList)
+
+    
 
 def play_music():
     Music_Switch = not gui_objects.Music_Switch
@@ -61,15 +60,19 @@ def controls():
             if event.key == pygame.K_RETURN:
                 selection.move('ENTER')
 
+
+def updateMenus():
+    appsMenu.fill((40,40,40))
+    sideMenu.fill((40,40,40))
+
+
 def updateCanvas(): 
     #canvas.blit(background, dest = background_position)
     canvas.blit(sideMenu, (10, 20))
     canvas.blit(appsMenu, (canvas.get_width() * .19, 20))
-
-    appsMenu.fill((40, 40, 40))
+    updateMenus()
     mediaButton.display()
     apps.processApps(selection)
-    
     pygame.display.update()
 
 def gameLoop():
