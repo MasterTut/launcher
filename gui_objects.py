@@ -27,7 +27,7 @@ sideMenu.fill((50,50,50))
 
 
 class Button:
-      def __init__(self, x, y, buttonText='Default'):
+      def __init__(self, x, y,  buttonText='Default'):
           self.x = x
           self.y = y
           self.width = 256
@@ -37,6 +37,7 @@ class Button:
           self.surface = canvas 
           self.cmd = "echo " + self.buttonText
           self.isSelected = False
+          self.isImage = True 
 
           self.fillColors = { 'normal' : '#ffffff', 'hover' : '#666666',  'pressed' : '#333333', }
 
@@ -60,20 +61,21 @@ class Button:
             self.surface.blit(image, (self.buttonRect.x -25, self.buttonRect.y -25))
         else:
             self.surface.blit(self.buttonImage, self.buttonRect)
-      def process(self):
+      def processMouseClick(self):
           mousePos = pygame.mouse.get_pos()
           if self.buttonRect.collidepoint(mousePos):
               self.onclickFunction()
-      def processSelection(self, selection, option):
+      def processSelection(self,selection):
         selectionPos = selection.selectionRect.x, selection.selectionRect.y
         if self.buttonRect.collidepoint(selectionPos):
-            if option == 'clicked':
-                self.onclickFunction()
-            if option == 'selected':
-                self.isSelected = True
+            self.isSelected = True
         else:
             self.isSelected = False
-        self.displayImage()
+        if self.isImage:
+            self.displayImage()
+        else:
+            self.display()
+
             
 class Selection:
     def __init__(self, appLayout, sideMenuList) -> None:
@@ -82,13 +84,19 @@ class Selection:
         self.appLayout = appLayout
         self.x = appLayout[0][0].buttonRect.x 
         self.y = appLayout[0][0].buttonRect.y 
-        self.width = 255
-        self.height = 255
+        self.width = 10 
+        self.height = 10 
         self.selectionImage = pygame.image.load("./Assets/testing.png")
         # self.selectionSurface = pygame.Surface((self.width, self.height))
         self.selectionRect = pygame.Rect(self.x, self.y, self.width, self.height)
         self.selectionGrid = [0, 0]
     
+    def select(self):
+        for line in self.appLayout:
+            for button in line:
+                button.processSelection(self)
+        for button in self.sideMenuList:
+            button.processSelection(self)
 
     def move(self, option):
         numberOfLines = len(self.appLayout)
@@ -98,7 +106,6 @@ class Selection:
             if numberOfAppsInRow == self.selectionGrid[0] + 1 and not self.menuSelected:
                 self.menuSelected = True
                 self.selectionGrid = [0, 0]
-                self.selectionRect = self.sideMenuList[0].buttonRect
             else:
                 self.selectionGrid[0] += 1
         if option == 'RIGHT':
@@ -136,23 +143,15 @@ class Selection:
         #update numberOfAppsInRow with the adjust before checking agian(betterway?) 
         if self.menuSelected:
             self.selectionRect = self.sideMenuList[self.selectionGrid[1]].buttonRect
-            menuItem = self.sideMenuList[self.selectionGrid[1]]
-            if option == 'ENTER':
-                menuItem.processSelection(self, 'clicked')
-            else:
-                menuItem.processSelection(self, 'selected')
-
+            nextButton = self.sideMenuList[self.selectionGrid[1]]
         else:
             numberOfAppsInRow = len(self.appLayout[self.selectionGrid[1]])
             if numberOfAppsInRow - 1 <= self.selectionGrid[0]:
                 self.selectionGrid[0] = numberOfAppsInRow - 1
-            
-            nextApp = self.appLayout[self.selectionGrid[1]][self.selectionGrid[0]]
-            self.selectionRect  = nextApp.buttonRect
-            if option == 'ENTER':
-                nextApp.processSelection(self, 'clicked')
-            else:
-                nextApp.processSelection(self, 'selected')
+            nextButton = self.appLayout[self.selectionGrid[1]][self.selectionGrid[0]]
+            self.selectionRect  = nextButton.buttonRect
+        if option == 'ENTER':
+            nextButton.onclickFunction()
 
 class Apps:
     def __init__(self, appsFile) -> None:
@@ -184,14 +183,6 @@ class Apps:
                 else:
                      self.widthAdjustment += -280
             return self.appLayout
-    def displayApps(self):
-        for line in self.appLayout:
-            for button in line:
-                button.displayImage()
-    def processApps(self, selection):
-        for line in self.appLayout:
-            for button in line:
-                button.processSelection(selection, 'selected')
 
 class DialogBox:
     def __init__(self, x, y):
@@ -234,99 +225,4 @@ class menu:
                     self.start_stop_music.process()
                     self.exit_game.process()
             pygame.display.update()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

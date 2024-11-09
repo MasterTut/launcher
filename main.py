@@ -15,6 +15,7 @@ background_position = (0, 0)
 sideMenuList = []
 sideMenu = gui_objects.sideMenu
 mediaButton = gui_objects.Button(gui_objects.sideMenu.get_width() * .1,40, "Media")
+mediaButton.isImage =False
 mediaButton.surface = gui_objects.sideMenu
 sideMenuList.append(mediaButton)
 appsMenu = gui_objects.appsMenu
@@ -72,7 +73,7 @@ def updateCanvas():
     canvas.blit(appsMenu, (canvas.get_width() * .19, 20))
     updateMenus()
     mediaButton.display()
-    apps.processApps(selection)
+    selection.select()
     pygame.display.update()
 
 def gameLoop():
