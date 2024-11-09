@@ -78,6 +78,7 @@ class Button:
 
             
 class Selection:
+    #find a way to pull in apps from a list
     def __init__(self, appLayout, sideMenuList) -> None:
         self.sideMenuList = sideMenuList
         self.menuSelected = False 
@@ -152,37 +153,6 @@ class Selection:
             self.selectionRect  = nextButton.buttonRect
         if option == 'ENTER':
             nextButton.onclickFunction()
-
-class Apps:
-    def __init__(self, appsFile) -> None:
-        self.displaySurface = appsMenu 
-        self.appsFile = appsFile
-        self.appLayout = [[]]
-        self.hightAdjustment = self.displaySurface.get_height() * .010 
-        self.widthAdjustment = self.displaySurface.get_width() * .79
-        self.lineNumber = 0
-    def importApps(self):
-        with open(self.appsFile, 'r') as apps:
-
-            data = json.load(apps)
-            for app in data['apps']:
-                newButton = Button(self.widthAdjustment, self.hightAdjustment, app['name'])
-                newButton.buttonImage = pygame.image.load(app['image'])
-                newButton.buttonImage = pygame.transform.scale(newButton.buttonImage,(256,256))
-                newButton.cmd = app['cmd']
-                newButton.surface = self.displaySurface
-                self.appLayout[self.lineNumber].append(newButton)
-                #after button is appended it adjusts the location
-                #location of apps are adjusted based on the surface area of appsMenu vs the window size
-                #the idea is more consistancy dispite window size
-                if self.widthAdjustment < (self.displaySurface.get_width() * .50):
-                     self.lineNumber += 1
-                     self.appLayout.append([])
-                     self.hightAdjustment += self.hightAdjustment + 266
-                     self.widthAdjustment = self.displaySurface.get_width() * .79
-                else:
-                     self.widthAdjustment += -280
-            return self.appLayout
 
 class DialogBox:
     def __init__(self, x, y):

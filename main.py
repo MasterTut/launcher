@@ -2,6 +2,7 @@
 import pygame 
 import sys
 import gui_objects
+import json
 #setup
 canvas = gui_objects.canvas
 canvas.fill((30, 30, 30))
@@ -12,18 +13,50 @@ background= pygame.image.load("./Images/background.png")
 background_position = (0, 0)
 
 #setup GUI
-sideMenuList = []
+
 sideMenu = gui_objects.sideMenu
-mediaButton = gui_objects.Button(gui_objects.sideMenu.get_width() * .1,40, "Media")
-mediaButton.isImage =False
-mediaButton.surface = gui_objects.sideMenu
-sideMenuList.append(mediaButton)
 appsMenu = gui_objects.appsMenu
-apps = gui_objects.Apps('./apps.json')
-appLayout = apps.importApps() 
+
+
+def importSideMenu():
+    sideMenuList = []
+    mediaButton = gui_objects.Button(sideMenu.get_width() * .1,40, "Media")
+    mediaButton.isImage = False
+    mediaButton.surface = gui_objects.sideMenu
+    sideMenuList.append(mediaButton)
+    return sideMenuList
+
+
+def importApps():
+    displaySurface = appsMenu 
+    appLayout = [[]]
+    hightAdjustment = displaySurface.get_height() * .010 
+    widthAdjustment = displaySurface.get_width() * .79
+    lineNumber = 0
+    with open('./apps.json', 'r') as apps:
+                                                                                                    
+        data = json.load(apps)
+        for app in data['apps']:
+            newButton = gui_objects.Button(widthAdjustment, hightAdjustment, app['name'])
+            newButton.buttonImage = pygame.image.load(app['image'])
+            newButton.buttonImage = pygame.transform.scale(newButton.buttonImage,(256,256))
+            newButton.cmd = app['cmd']
+            newButton.surface = displaySurface
+            appLayout[lineNumber].append(newButton)
+            #after button is appended it adjusts the location
+            #location of apps are adjusted based on the surface area of appsMenu vs the window size
+            #the idea is more consistancy dispite window size
+            if widthAdjustment < (displaySurface.get_width() * .50):
+                 lineNumber += 1
+                 appLayout.append([])
+                 hightAdjustment += hightAdjustment + 266
+                 widthAdjustment = displaySurface.get_width() * .79
+            else:
+                 widthAdjustment += -280
+        return appLayout
 
 #Start Selction on the top right App            
-selection = gui_objects.Selection(appLayout, sideMenuList)
+selection = gui_objects.Selection(importApps(), importSideMenu())
 
     
 
@@ -72,7 +105,6 @@ def updateCanvas():
     canvas.blit(sideMenu, (10, 20))
     canvas.blit(appsMenu, (canvas.get_width() * .19, 20))
     updateMenus()
-    mediaButton.display()
     selection.select()
     pygame.display.update()
 
