@@ -19,25 +19,31 @@ canvas = pygame.display.set_mode((resolutionWidth, resolutionHeight), pygame.RES
 background= pygame.image.load("./Images/background.png")
 background_position = (0, 0)
 
+#adding app size so this can be adjusted based on resolutionWidth
+buttonWidth = 256
+buttonHeight = 256
+panding = 25
+numberOfAppsPerLine = 5
+numberOfRows = 3
 #Adding Menus
-appsMenu = pygame.Surface((resolutionWidth *.8, resolutionHeight *.9))
+appsMenu = pygame.Surface(((buttonWidth + panding) * numberOfAppsPerLine + panding, (buttonHeight + panding)* numberOfRows + panding))
+print(appsMenu.get_width(), appsMenu.get_height())
 sideMenu = pygame.Surface((200,resolutionHeight *.9))
-appsMenu.fill((40,40,40))
-sideMenu.fill((50,50,50))
+
 
 
 class Button:
       def __init__(self, x, y,  buttonText='Default'):
           self.x = x
           self.y = y
-          self.width = 256
-          self.height = 256
+          self.width = buttonWidth 
+          self.height = buttonHeight 
           self.buttonText = buttonText
+          self.isImage = False
           self.buttonImage = pygame.image.load("./Assets/testing.png")
           self.surface = canvas 
           self.cmd = "echo " + self.buttonText
           self.isSelected = False
-          self.isImage = True 
 
           self.fillColors = { 'normal' : '#ffffff', 'hover' : '#666666',  'pressed' : '#333333', }
 
@@ -49,9 +55,8 @@ class Button:
           self.highlighted = False
       def onclickFunction(self):
           subprocess.call(self.cmd, shell=True)
-      def display(self):
-          mousePos = pygame.mouse.get_pos()
-          if self.buttonRect.collidepoint(mousePos) or self.isSelected:
+      def displayText(self):
+          if self.isSelected:
               self.surface.blit(self.font_rendered_highlighted, self.buttonRect)
           else:
               self.surface.blit(self.font_rendered, self.buttonRect)
@@ -61,98 +66,75 @@ class Button:
             self.surface.blit(image, (self.buttonRect.x -25, self.buttonRect.y -25))
         else:
             self.surface.blit(self.buttonImage, self.buttonRect)
-      def processMouseClick(self):
-          mousePos = pygame.mouse.get_pos()
-          if self.buttonRect.collidepoint(mousePos):
-              self.onclickFunction()
-      def processSelection(self,selection):
-        selectionPos = selection.selectionRect.x, selection.selectionRect.y
-        if self.buttonRect.collidepoint(selectionPos):
-            self.isSelected = True
-        else:
-            self.isSelected = False
-        if self.isImage:
-            self.displayImage()
-        else:
-            self.display()
+      def display(self):
+            if self.isImage:
+                self.displayImage()
+            else:
+                self.displayText()
 
             
 class Selection:
     #find a way to pull in apps from a list
-    def __init__(self, appLayout, sideMenuList) -> None:
+    def __init__(self, appsArray, sideMenuList) -> None:
+        self.menu = appsMenu
         self.sideMenuList = sideMenuList
+        self.appsArray = appsArray 
         self.menuSelected = False 
-        self.appLayout = appLayout
-        self.x = appLayout[0][0].buttonRect.x 
-        self.y = appLayout[0][0].buttonRect.y 
-        self.width = 10 
-        self.height = 10 
-        self.selectionImage = pygame.image.load("./Assets/testing.png")
-        # self.selectionSurface = pygame.Surface((self.width, self.height))
+        self.x = 143 
+        self.y = 144 
+        self.width = 25 
+        self.height = 25
         self.selectionRect = pygame.Rect(self.x, self.y, self.width, self.height)
-        self.selectionGrid = [0, 0]
-    
+        # adding a selection surface is to get a visual of what it is selcting this should 
+        # able to comment out in production
+        self.selectionSurface = pygame.Surface((self.width, self.height))
+        self.selectionSurface.fill((100, 100, 100))
+
     def select(self):
-        for line in self.appLayout:
-            for button in line:
-                button.processSelection(self)
-        for button in self.sideMenuList:
-            button.processSelection(self)
-
-    def move(self, option):
-        numberOfLines = len(self.appLayout)
-        numberOfAppsInRow = len(self.appLayout[self.selectionGrid[1]])
-        if option == 'LEFT':
-            #if on app menu move over to sideMenu if you are at farthest left app 
-            if numberOfAppsInRow == self.selectionGrid[0] + 1 and not self.menuSelected:
-                self.menuSelected = True
-                self.selectionGrid = [0, 0]
-            else:
-                self.selectionGrid[0] += 1
-        if option == 'RIGHT':
-            #if selection is on side menu move back over to AppMenu
-            if self.menuSelected:
-                self.selectionRect = self.appLayout[0][0].buttonRect
-                self.selectionGrid[0], self.selectionGrid[1] = 0, 0
-                self.menuSelected = False
-            elif 0 == self.selectionGrid[0]:
-                self.selectionGrid[0] = numberOfAppsInRow -1 
-            else:
-                self.selectionGrid[0] -= 1
-        if option == 'UP':
-            if self.menuSelected:
-                if self.selectionGrid[1] == 0:
-                    self.selectionGrid[1] = len(self.sideMenuList) -1
+        self.menu.blit(self.selectionSurface, self.selectionRect)
+        if self.menu == appsMenu:
+            for button in self.appsArray:
+                if button.buttonRect.collidepoint(self.selectionRect.x, self.selectionRect.y):
+                    button.isSelected = True
                 else:
-                    self.selectionGrid[1] += 1
-
-            elif self.selectionGrid[1] == 0:
-                self.selectionGrid[1] = numberOfLines -2 
-            else:
-                self.selectionGrid[1] -= 1
-
-        if option == 'DOWN':
-            if self.menuSelected:
-                if self.selectionGrid[1] == len(self.sideMenuList) -1:
-                    self.selectionGrid[1] = 0
+                    button.isSelected = False
+        elif self.menu == sideMenu:
+            for button in self.sideMenuList:
+                if self.selectionRect.collidepoint(button.x, button.y):
+                    button.isSelected = True
                 else:
-                    self.selectionGrid[1] -= 1
-            elif self.selectionGrid[1] == numberOfLines -2:
-                self.selectionGrid[1] = 0
+                    button.isSelected =False
+    
+    
+    def anotherMoveFunc(self, movement): 
+        if movement == 'RIGHT':
+            if self.menu == sideMenu:
+                self.menu = appsMenu
+                self.selectionRect.x, self.selectionRect.y  = int(self.x), int(self.y) 
+            if self.selectionRect.x > appsMenu.get_width():
+                self.selectionRect.x = 0
             else:
-                self.selectionGrid[1] += 1
-        #update numberOfAppsInRow with the adjust before checking agian(betterway?) 
-        if self.menuSelected:
-            self.selectionRect = self.sideMenuList[self.selectionGrid[1]].buttonRect
-            nextButton = self.sideMenuList[self.selectionGrid[1]]
-        else:
-            numberOfAppsInRow = len(self.appLayout[self.selectionGrid[1]])
-            if numberOfAppsInRow - 1 <= self.selectionGrid[0]:
-                self.selectionGrid[0] = numberOfAppsInRow - 1
-            nextButton = self.appLayout[self.selectionGrid[1]][self.selectionGrid[0]]
-            self.selectionRect  = nextButton.buttonRect
-        if option == 'ENTER':
-            nextButton.onclickFunction()
+                self.selectionRect.x += 286 
+        if movement == 'LEFT':
+            if self.selectionRect.x < 286:
+                self.menu = sideMenu 
+                self.selectionRect.x = 0 
+                self.selectionRect.y = 0
+            else:
+                self.selectionRect.x -= 286 
+        if movement == 'UP':
+            if self.selectionRect.y < 288:
+                self.selectionRect.y = int(self.y)  
+            else:
+                self.selectionRect.y -= 288 
+        if movement == 'DOWN':
+            if self.selectionRect.y > appsMenu.get_height():
+                self.selectionRect.y = int(self.y) 
+            else:
+                self.selectionRect.y += 288 
+        if movement == 'ENTER':
+            print('enter')
+        self.select()
 
 class DialogBox:
     def __init__(self, x, y):

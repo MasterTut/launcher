@@ -16,47 +16,53 @@ background_position = (0, 0)
 
 sideMenu = gui_objects.sideMenu
 appsMenu = gui_objects.appsMenu
+menuSelected = pygame.Surface
 
-
+def menuSelect():
+    menuSelected = appsMenu
+    return menuSelected
+    
 def importSideMenu():
-    sideMenuList = []
-    mediaButton = gui_objects.Button(sideMenu.get_width() * .1,40, "Media")
-    mediaButton.isImage = False
-    mediaButton.surface = gui_objects.sideMenu
-    sideMenuList.append(mediaButton)
-    return sideMenuList
+    sideMenuList = ['Media', 'Settings', 'other', 'other2']
+    sideMenuButtons = []
+    height = 40
+    for button in sideMenuList:
+        sideMenuButton = gui_objects.Button(sideMenu.get_width() * .1, height, button)
+        sideMenuButton.surface = gui_objects.sideMenu
+        sideMenuButtons.append(sideMenuButton)
+        height += 40 
+    return sideMenuButtons 
 
 
 def importApps():
-    displaySurface = appsMenu 
-    appLayout = [[]]
-    hightAdjustment = displaySurface.get_height() * .010 
-    widthAdjustment = displaySurface.get_width() * .79
-    lineNumber = 0
+    appsArray = [] 
+    panding = 25
+    y = panding 
+    x = panding 
     with open('./apps.json', 'r') as apps:
                                                                                                     
         data = json.load(apps)
         for app in data['apps']:
-            newButton = gui_objects.Button(widthAdjustment, hightAdjustment, app['name'])
+            newButton = gui_objects.Button(x, y, app['name'])
             newButton.buttonImage = pygame.image.load(app['image'])
-            newButton.buttonImage = pygame.transform.scale(newButton.buttonImage,(256,256))
+            newButton.buttonImage = pygame.transform.scale(newButton.buttonImage,(newButton.width,newButton.height))
             newButton.cmd = app['cmd']
-            newButton.surface = displaySurface
-            appLayout[lineNumber].append(newButton)
+            newButton.isImage = True
+            newButton.surface = appsMenu
+            appsArray.append(newButton)
             #after button is appended it adjusts the location
             #location of apps are adjusted based on the surface area of appsMenu vs the window size
             #the idea is more consistancy dispite window size
-            if widthAdjustment < (displaySurface.get_width() * .50):
-                 lineNumber += 1
-                 appLayout.append([])
-                 hightAdjustment += hightAdjustment + 266
-                 widthAdjustment = displaySurface.get_width() * .79
+            if x > (appsMenu.get_width() -newButton.width*2 + panding ):
+                 y += newButton.height + panding 
+                 x = panding 
             else:
-                 widthAdjustment += -280
-        return appLayout
+                 x += newButton.width + panding 
+        return appsArray 
 
-#Start Selction on the top right App            
-selection = gui_objects.Selection(importApps(), importSideMenu())
+#Start Selction on the top right App
+apps, sideMenuButtons = importApps(), importSideMenu()
+selection = gui_objects.Selection(apps, sideMenuButtons)
 
     
 
@@ -84,16 +90,20 @@ def controls():
             if event.key == pygame.K_ESCAPE:
                 sys.exit()
             if event.key == pygame.K_RIGHT:
-                selection.move('RIGHT')
+                selection.anotherMoveFunc('RIGHT')
             if event.key == pygame.K_LEFT:
-               selection.move('LEFT') 
+                selection.anotherMoveFunc('LEFT')
             if event.key == pygame.K_DOWN:
-                selection.move('DOWN') 
+                selection.anotherMoveFunc('DOWN') 
             if event.key == pygame.K_UP:
-                selection.move('UP') 
+                selection.anotherMoveFunc('UP') 
             if event.key == pygame.K_RETURN:
-                selection.move('ENTER')
+                selection.anotherMoveFunc('ENTER')
 
+
+def displayButtons(buttons):
+    for button in buttons:
+        button.display()
 
 def updateMenus():
     appsMenu.fill((40,40,40))
@@ -102,10 +112,11 @@ def updateMenus():
 
 def updateCanvas(): 
     #canvas.blit(background, dest = background_position)
-    canvas.blit(sideMenu, (10, 20))
     canvas.blit(appsMenu, (canvas.get_width() * .19, 20))
+    canvas.blit(sideMenu, (10, 20))
+    #appsMenu.blit(selection.selectionImage, selection.x, selection.y) 
     updateMenus()
-    selection.select()
+    displayButtons(apps)
     pygame.display.update()
 
 def gameLoop():
