@@ -16,11 +16,7 @@ background_position = (0, 0)
 
 sideMenu = gui_objects.sideMenu
 appsMenu = gui_objects.appsMenu
-menuSelected = pygame.Surface
 
-def menuSelect():
-    menuSelected = appsMenu
-    return menuSelected
     
 def importSideMenu():
     sideMenuList = ['Media', 'Settings', 'other', 'other2']
@@ -61,10 +57,13 @@ def importApps():
         return appsArray 
 
 #Start Selction on the top right App
-apps, sideMenuButtons = importApps(), importSideMenu()
-selection = gui_objects.Selection(apps, sideMenuButtons)
+allButtons =[ *importApps(), *importSideMenu() ]
+selection = gui_objects.Selection(allButtons)
 
     
+def displayButtons(allButtons):
+    for button in allButtons:
+        button.display()
 
 def play_music():
     Music_Switch = not gui_objects.Music_Switch
@@ -78,9 +77,8 @@ def play_music():
         mixer.music.stop()
 
 
-#defines key mappings
+#defines key mappings, the event listener needs to be in gameLoop
 def controls():
-
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             sys.exit()
@@ -90,20 +88,16 @@ def controls():
             if event.key == pygame.K_ESCAPE:
                 sys.exit()
             if event.key == pygame.K_RIGHT:
-                selection.anotherMoveFunc('RIGHT')
+                selection.move('RIGHT')
             if event.key == pygame.K_LEFT:
-                selection.anotherMoveFunc('LEFT')
+                selection.move('LEFT')
             if event.key == pygame.K_DOWN:
-                selection.anotherMoveFunc('DOWN') 
+                selection.move('DOWN') 
             if event.key == pygame.K_UP:
-                selection.anotherMoveFunc('UP') 
+                selection.move('UP') 
             if event.key == pygame.K_RETURN:
-                selection.anotherMoveFunc('ENTER')
+                selection.move('ENTER')
 
-
-def displayButtons(buttons):
-    for button in buttons:
-        button.display()
 
 def updateMenus():
     appsMenu.fill((40,40,40))
@@ -116,7 +110,7 @@ def updateCanvas():
     canvas.blit(sideMenu, (10, 20))
     #appsMenu.blit(selection.selectionImage, selection.x, selection.y) 
     updateMenus()
-    displayButtons(apps)
+    displayButtons(allButtons)
     pygame.display.update()
 
 def gameLoop():

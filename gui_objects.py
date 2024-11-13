@@ -24,13 +24,23 @@ buttonWidth = 256
 buttonHeight = 256
 panding = 25
 numberOfAppsPerLine = 5
-numberOfRows = 3
+numberOfRows = 1 
 #Adding Menus
-appsMenu = pygame.Surface(((buttonWidth + panding) * numberOfAppsPerLine + panding, (buttonHeight + panding)* numberOfRows + panding))
-print(appsMenu.get_width(), appsMenu.get_height())
-sideMenu = pygame.Surface((200,resolutionHeight *.9))
 
+class Menu:
+    def __init__(self, buttonWidth, buttonHeight,panding,numberOfButtonsPerLine,numberOfRows, name='Default') -> None:
+        self.buttonWidth = buttonWidth
+        self.buttonHeight = buttonHeight
+        self.name = name
+        self.panding = panding 
+        self.numberOfButtonsPerLine = numberOfButtonsPerLine 
+        self.numberOfRows = numberOfRows 
+        self.surface = pygame.Surface(((self.buttonWidth + self.panding) * self.numberOfButtonsPerLine+ self.panding, \
+                                           (self.buttonHeight + self.panding)* self.numberOfRows + self.panding))
 
+appsMenu = Menu(256, 256, 25, 5, 1,'appsMenu').surface
+sideMenu = Menu(200, 40, 5, 1, 5,"sideMenu").surface       
+settingMenu = Menu(256, 256, 25, 5, 1,'appsMenu').surface 
 
 class Button:
       def __init__(self, x, y,  buttonText='Default'):
@@ -75,15 +85,14 @@ class Button:
             
 class Selection:
     #find a way to pull in apps from a list
-    def __init__(self, appsArray, sideMenuList) -> None:
+    def __init__(self,  buttons) -> None:
         self.menu = appsMenu
-        self.sideMenuList = sideMenuList
-        self.appsArray = appsArray 
+        self.buttons = buttons
         self.menuSelected = False 
-        self.x = 143 
-        self.y = 144 
-        self.width = 25 
-        self.height = 25
+        self.x = (self.menu.get_width() / numberOfAppsPerLine) /2
+        self.y = (self.menu.get_height() / numberOfRows) /2 
+        self.width = 50 
+        self.height = 50
         self.selectionRect = pygame.Rect(self.x, self.y, self.width, self.height)
         # adding a selection surface is to get a visual of what it is selcting this should 
         # able to comment out in production
@@ -91,90 +100,48 @@ class Selection:
         self.selectionSurface.fill((100, 100, 100))
 
     def select(self):
+        selectedButton = None
         self.menu.blit(self.selectionSurface, self.selectionRect)
-        if self.menu == appsMenu:
-            for button in self.appsArray:
-                if button.buttonRect.collidepoint(self.selectionRect.x, self.selectionRect.y):
-                    button.isSelected = True
-                else:
-                    button.isSelected = False
-        elif self.menu == sideMenu:
-            for button in self.sideMenuList:
-                if self.selectionRect.collidepoint(button.x, button.y):
-                    button.isSelected = True
-                else:
-                    button.isSelected =False
+        for button in self.buttons:
+            if button.buttonRect.collidepoint(self.selectionRect.x, self.selectionRect.y):
+                button.isSelected = True
+                selectedButton = button
+            else:
+                button.isSelected = False
+        return selectedButton
+
     
-    
-    def anotherMoveFunc(self, movement): 
+    def move(self, movement):
         if movement == 'RIGHT':
             if self.menu == sideMenu:
                 self.menu = appsMenu
                 self.selectionRect.x, self.selectionRect.y  = int(self.x), int(self.y) 
-            if self.selectionRect.x > appsMenu.get_width():
-                self.selectionRect.x = 0
+            elif self.selectionRect.x >= appsMenu.get_width() -int(self.x):
+                self.selectionRect.x = int(self.x) 
             else:
                 self.selectionRect.x += 286 
         if movement == 'LEFT':
             if self.selectionRect.x < 286:
                 self.menu = sideMenu 
-                self.selectionRect.x = 0 
-                self.selectionRect.y = 0
+                self.selectionRect.x = 19 
+                self.selectionRect.y = 25 
             else:
                 self.selectionRect.x -= 286 
         if movement == 'UP':
-            if self.selectionRect.y < 288:
+            if self.menu == sideMenu:
+                self.selectionRect.y -= 30 
+            elif self.selectionRect.y < 288:
                 self.selectionRect.y = int(self.y)  
             else:
                 self.selectionRect.y -= 288 
         if movement == 'DOWN':
-            if self.selectionRect.y > appsMenu.get_height():
+            if self.menu == sideMenu:
+                self.selectionRect.y +=30
+            elif self.selectionRect.y >= appsMenu.get_height() -int(self.y):
                 self.selectionRect.y = int(self.y) 
             else:
                 self.selectionRect.y += 288 
-        if movement == 'ENTER':
-            print('enter')
-        self.select()
-
-class DialogBox:
-    def __init__(self, x, y):
-        self.x = x
-        self.y =y
-        self.width = 150
-        self.height = 30
-
-        self.dialogSurface = pygame.Surface((self.width, self.height))
-        self.dialogRect = pygame.Rect(self.x, self.y, self.width, self.height)
-
-    def print_text(self, text):
-        font = pygame.font.Font('./Font/VarinonormalRegular-1GXaM.ttf', 20)
-        font_rendered = font.render(text, True, (0,255,0))
-        return font_rendered
-
-class menu:
-    def __init__(self, x ,y) -> None:
-        self.is_open = False 
-        self.x = x 
-        self.y = y
-        self.width =  500
-        self.height = 700
-        self.image = pygame.image.load("./Images/menu.png")
-        self.music_switch = "On"
-        self.surface = pygame.Surface((self.width, self.height))
-        self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
-        self.start_stop_music = Button(self.x +150, self.y +60, 'Music: ')
-        self.exit_game = Button(self.x +150, self.y + 90, "Exit Game")
-    def display(self):
-        if self.is_open:
-            canvas.blit(self.image, self.rect)
-            self.start_stop_music.display()
-            self.exit_game.display()
-            for e in pygame.event.get():
-                if e.type == pygame.KEYDOWN:
-                    if e.key == pygame.K_ESCAPE:
-                        self.is_open = False
-                if e.type == pygame.MOUSEBUTTONDOWN:
-                    self.start_stop_music.process()
-                    self.exit_game.process()
-            pygame.display.update()
+        button = self.select()
+        if movement == 'ENTER' and button:
+            button.onclickFunction()
 
