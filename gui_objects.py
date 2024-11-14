@@ -1,7 +1,7 @@
 import pygame
 import subprocess
-import json
 import os
+import sys
 #create gui canvas
 BLACK = (255,255,255)
 
@@ -28,19 +28,24 @@ numberOfRows = 1
 #Adding Menus
 
 class Menu:
-    def __init__(self, buttonWidth, buttonHeight,panding,numberOfButtonsPerLine,numberOfRows, name='Default') -> None:
+    def __init__(self, x, y, buttonWidth, buttonHeight,panding,numberOfButtonsPerLine,numberOfRows, name='Default') -> None:
         self.buttonWidth = buttonWidth
         self.buttonHeight = buttonHeight
         self.name = name
         self.panding = panding 
         self.numberOfButtonsPerLine = numberOfButtonsPerLine 
         self.numberOfRows = numberOfRows 
-        self.surface = pygame.Surface(((self.buttonWidth + self.panding) * self.numberOfButtonsPerLine+ self.panding, \
-                                           (self.buttonHeight + self.panding)* self.numberOfRows + self.panding))
+        self.x = x 
+        self.y = y 
+        self.width = (self.buttonWidth + self.panding) * self.numberOfButtonsPerLine+ self.panding
+        self.height =(self.buttonHeight + self.panding)* self.numberOfRows + self.panding
+        self.surface = pygame.Surface((self.width,self.width)) 
+        self.menuRect = pygame.Rect(self.x, self.y, self.width, self.height)
 
-appsMenu = Menu(256, 256, 25, 5, 1,'appsMenu').surface
-sideMenu = Menu(200, 40, 5, 1, 5,"sideMenu").surface       
-settingMenu = Menu(256, 256, 25, 5, 1,'appsMenu').surface 
+appsMenu = Menu(canvas.get_width() * .19, 20, 256, 256, 25, 5, 1,'appsMenu')
+sideMenu = Menu(10, 20, 200, 200, 5, 1, 5,"sideMenu")       
+# settingMenu = Menu(256, 256, 25, 5, 1,'appsMenu') 
+Menus = [appsMenu, sideMenu]
 
 class Button:
       def __init__(self, x, y,  buttonText='Default'):
@@ -86,13 +91,14 @@ class Button:
 class Selection:
     #find a way to pull in apps from a list
     def __init__(self,  buttons) -> None:
+        self.menus = Menus 
         self.menu = appsMenu
         self.buttons = buttons
         self.menuSelected = False 
-        self.x = (self.menu.get_width() / numberOfAppsPerLine) /2
-        self.y = (self.menu.get_height() / numberOfRows) /2 
-        self.width = 50 
-        self.height = 50
+        self.x = buttons[0].buttonRect.x  
+        self.y = buttons[0].buttonRect.y 
+        self.width = 20 
+        self.height = 30 
         self.selectionRect = pygame.Rect(self.x, self.y, self.width, self.height)
         # adding a selection surface is to get a visual of what it is selcting this should 
         # able to comment out in production
@@ -101,47 +107,63 @@ class Selection:
 
     def select(self):
         selectedButton = None
-        self.menu.blit(self.selectionSurface, self.selectionRect)
-        for button in self.buttons:
-            if button.buttonRect.collidepoint(self.selectionRect.x, self.selectionRect.y):
-                button.isSelected = True
-                selectedButton = button
+        for Menu in self.menus:
+            if Menu.menuRect.contains(self.selectionRect):
+                self.menu = Menu 
+        for Button in self.buttons:
+            if Button.buttonRect.contains(self.selectionRect):
+                Button.isSelected = True
+                selectedButton = Button 
             else:
-                button.isSelected = False
+                Button.isSelected = False
         return selectedButton
 
+        
+    def moveSlection(self ):
+        currentlySelected = self.select()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                pass
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    sys.exit()
+                if event.key == pygame.K_RIGHT:
+                    self.moving(1, 0, 0, 0, currentlySelected)
+                if event.key == pygame.K_LEFT:
+                    self.moving(0, 1, 0, 0, currentlySelected)
+                if event.key == pygame.K_UP:
+                    self.moving(0, 0, 1, 0, currentlySelected)
+                if event.key == pygame.K_DOWN:
+                    self.moving(0, 0, 0, 1, currentlySelected)
+                if event.key == pygame.K_RETURN:
+                    if currentlySelected != None:
+                        currentlySelected.onclickFunction()
     
-    def move(self, movement):
-        if movement == 'RIGHT':
-            if self.menu == sideMenu:
-                self.menu = appsMenu
-                self.selectionRect.x, self.selectionRect.y  = int(self.x), int(self.y) 
-            elif self.selectionRect.x >= appsMenu.get_width() -int(self.x):
-                self.selectionRect.x = int(self.x) 
-            else:
-                self.selectionRect.x += 286 
-        if movement == 'LEFT':
-            if self.selectionRect.x < 286:
-                self.menu = sideMenu 
-                self.selectionRect.x = 19 
-                self.selectionRect.y = 25 
-            else:
-                self.selectionRect.x -= 286 
-        if movement == 'UP':
-            if self.menu == sideMenu:
-                self.selectionRect.y -= 30 
-            elif self.selectionRect.y < 288:
-                self.selectionRect.y = int(self.y)  
-            else:
-                self.selectionRect.y -= 288 
-        if movement == 'DOWN':
-            if self.menu == sideMenu:
-                self.selectionRect.y +=30
-            elif self.selectionRect.y >= appsMenu.get_height() -int(self.y):
-                self.selectionRect.y = int(self.y) 
-            else:
-                self.selectionRect.y += 288 
-        button = self.select()
-        if movement == 'ENTER' and button:
-            button.onclickFunction()
+    def moving(self, RIGHT, LEFT, UP, DOWN, currentlySelected):
+        button = currentlySelected 
+        while button == currentlySelected or button == None:
+            self.menu.surface.blit(self.selectionSurface, self.selectionRect)
+            self.selectionRect.x += RIGHT
+            self.selectionRect.x -= LEFT
+            self.selectionRect.y -= UP 
+            self.selectionRect.y += DOWN
+            if self.selectionRect.x <= 0:
+                self.selectionRect.x = resolutionWidth
+            if self.selectionRect.x > resolutionWidth:
+                self.selectionRect.x = 1
+            if self.selectionRect.y > resolutionHeight:
+                self.selectionRect.y = 1
+            if self.selectionRect.y <=0:
+                self.selectionRect.y = resolutionHeight
+            button = self.select()
+            if button == None:
+               currentlySelected = None
+            
+            
+            
+                        
+
+
 

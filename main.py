@@ -21,10 +21,12 @@ appsMenu = gui_objects.appsMenu
 def importSideMenu():
     sideMenuList = ['Media', 'Settings', 'other', 'other2']
     sideMenuButtons = []
-    height = 40
+    height = 20
     for button in sideMenuList:
-        sideMenuButton = gui_objects.Button(sideMenu.get_width() * .1, height, button)
-        sideMenuButton.surface = gui_objects.sideMenu
+        sideMenuButton = gui_objects.Button(sideMenu.surface.get_width() * .1, height, button)
+        sideMenuButton.buttonRect.width= 20
+        sideMenuButton.buttonRect.height = 50 
+        sideMenuButton.surface = sideMenu.surface 
         sideMenuButtons.append(sideMenuButton)
         height += 40 
     return sideMenuButtons 
@@ -44,12 +46,12 @@ def importApps():
             newButton.buttonImage = pygame.transform.scale(newButton.buttonImage,(newButton.width,newButton.height))
             newButton.cmd = app['cmd']
             newButton.isImage = True
-            newButton.surface = appsMenu
+            newButton.surface = appsMenu.surface
             appsArray.append(newButton)
             #after button is appended it adjusts the location
             #location of apps are adjusted based on the surface area of appsMenu vs the window size
             #the idea is more consistancy dispite window size
-            if x > (appsMenu.get_width() -newButton.width*2 + panding ):
+            if x > (appsMenu.surface.get_width() -newButton.width*2 + panding ):
                  y += newButton.height + panding 
                  x = panding 
             else:
@@ -60,6 +62,8 @@ def importApps():
 allButtons =[ *importApps(), *importSideMenu() ]
 selection = gui_objects.Selection(allButtons)
 
+#select the first button when program is run >
+# selection.select()
     
 def displayButtons(allButtons):
     for button in allButtons:
@@ -100,14 +104,13 @@ def controls():
 
 
 def updateMenus():
-    appsMenu.fill((40,40,40))
-    sideMenu.fill((40,40,40))
-
+    appsMenu.surface.fill((40,40,40))
+    sideMenu.surface.fill((40,40,40))
 
 def updateCanvas(): 
     #canvas.blit(background, dest = background_position)
-    canvas.blit(appsMenu, (canvas.get_width() * .19, 20))
-    canvas.blit(sideMenu, (10, 20))
+    canvas.blit(appsMenu.surface, (appsMenu.x, appsMenu.y))
+    canvas.blit(sideMenu.surface, (sideMenu.x, sideMenu.y))
     #appsMenu.blit(selection.selectionImage, selection.x, selection.y) 
     updateMenus()
     displayButtons(allButtons)
@@ -117,7 +120,8 @@ def gameLoop():
     global text, elapsed_time 
     while True:
         clock.tick(gui_objects.FPS)
-        controls()
+        # controls()
+        selection.moveSlection()
         updateCanvas()
 
 
