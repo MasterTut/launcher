@@ -94,7 +94,7 @@ class Selection:
         self.menus = Menus 
         self.menu = appsMenu
         self.buttons = buttons
-        self.menuSelected = False 
+        self.buttonSelected = buttons[0]
         self.x = buttons[0].buttonRect.x  
         self.y = buttons[0].buttonRect.y 
         self.width = 20 
@@ -106,21 +106,23 @@ class Selection:
         self.selectionSurface.fill((100, 100, 100))
 
     def select(self):
-        selectedButton = None
+        isThereAButton = False
         for Menu in self.menus:
             if Menu.menuRect.contains(self.selectionRect):
                 self.menu = Menu 
         for Button in self.buttons:
             if Button.buttonRect.contains(self.selectionRect):
+                isThereAButton = True 
                 Button.isSelected = True
-                selectedButton = Button 
+                self.buttonSelected = Button 
             else:
                 Button.isSelected = False
-        return selectedButton
+        return isThereAButton 
+         
 
         
     def moveSlection(self ):
-        currentlySelected = self.select()
+        self.select()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 sys.exit()
@@ -130,20 +132,22 @@ class Selection:
                 if event.key == pygame.K_ESCAPE:
                     sys.exit()
                 if event.key == pygame.K_RIGHT:
-                    self.moving(1, 0, 0, 0, currentlySelected)
+                    self.moving(1, 0, 0, 0)
                 if event.key == pygame.K_LEFT:
-                    self.moving(0, 1, 0, 0, currentlySelected)
+                    self.moving(0, 1, 0, 0)
                 if event.key == pygame.K_UP:
-                    self.moving(0, 0, 1, 0, currentlySelected)
+                    self.moving(0, 0, 1, 0)
                 if event.key == pygame.K_DOWN:
-                    self.moving(0, 0, 0, 1, currentlySelected)
+                    self.moving(0, 0, 0, 1)
                 if event.key == pygame.K_RETURN:
-                    if currentlySelected != None:
-                        currentlySelected.onclickFunction()
-    
-    def moving(self, RIGHT, LEFT, UP, DOWN, currentlySelected):
-        button = currentlySelected 
-        while button == currentlySelected or button == None:
+                        self.buttonSelected.onclickFunction()
+    #move 1 pixel until a new button or the same button is reselected
+    def moving(self, RIGHT, LEFT, UP, DOWN):
+        moving =True
+        tick = False 
+        while moving:
+            if not self.select():
+                tick = True 
             self.menu.surface.blit(self.selectionSurface, self.selectionRect)
             self.selectionRect.x += RIGHT
             self.selectionRect.x -= LEFT
@@ -157,10 +161,8 @@ class Selection:
                 self.selectionRect.y = 1
             if self.selectionRect.y <=0:
                 self.selectionRect.y = resolutionHeight
-            button = self.select()
-            if button == None:
-               currentlySelected = None
-            
+            if tick and self.select():
+                moving = False 
             
             
                         
