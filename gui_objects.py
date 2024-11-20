@@ -19,50 +19,38 @@ canvas = pygame.display.set_mode((resolutionWidth, resolutionHeight), pygame.RES
 background= pygame.image.load("./Images/background.png")
 background_position = (0, 0)
 
-#adding app size so this can be adjusted based on resolutionWidth
-buttonWidth = 256
-buttonHeight = 256
-panding = 25
-numberOfAppsPerLine = 5
-numberOfRows = 1 
 #Adding Menus
 
 class Menu:
-    def __init__(self, x, y, buttonWidth, buttonHeight,panding,numberOfButtonsPerLine,numberOfRows, name='Default') -> None:
-        self.buttonWidth = buttonWidth
-        self.buttonHeight = buttonHeight
+    def __init__(self, x, y, width, height, name='Default') -> None:
         self.name = name
-        self.panding = panding 
-        self.numberOfButtonsPerLine = numberOfButtonsPerLine 
-        self.numberOfRows = numberOfRows 
         self.x = x 
         self.y = y 
-        self.width = (self.buttonWidth + self.panding) * self.numberOfButtonsPerLine+ self.panding
-        self.height =(self.buttonHeight + self.panding)* self.numberOfRows + self.panding
-        self.surface = pygame.Surface((self.width,self.width)) 
-        self.menuRect = pygame.Rect(self.x, self.y, self.width, self.height)
+        self.width = width 
+        self.height = height
+        self.surface = pygame.Surface((self.width,self.height)) 
+        self.menuRect = self.surface.get_rect()
+        self.buttons = []
 
-appsMenu = Menu(canvas.get_width() * .19, 20, 256, 256, 25, 5, 1,'appsMenu')
-sideMenu = Menu(10, 20, 200, 200, 5, 1, 5,"sideMenu")       
-# settingMenu = Menu(256, 256, 25, 5, 1,'appsMenu') 
-Menus = [appsMenu, sideMenu]
+addAppMenu = Menu(canvas.get_width() * .19, 20, 1500, 1000, "addApp")
+appsMenu = Menu(canvas.get_width() * .19, 0, 1500, canvas.get_height(),'appsMenu')
+sideMenu = Menu(0, 0, 200, canvas.get_height(),"sideMenu")
+Menus = [ sideMenu, appsMenu ]
 
 class Button:
-      def __init__(self, x, y,  buttonText='Default'):
+      def __init__(self, x, y, width, height, buttonText='Default'):
           self.x = x
           self.y = y
-          self.width = buttonWidth 
-          self.height = buttonHeight 
+          self.width = width 
+          self.height = height 
           self.buttonText = buttonText
           self.isImage = False
           self.buttonImage = pygame.image.load("./Assets/testing.png")
-          self.surface = canvas 
+          self.layer = pygame.Surface((self.width,self.height))  
           self.cmd = "echo " + self.buttonText
           self.isSelected = False
-
           self.fillColors = { 'normal' : '#ffffff', 'hover' : '#666666',  'pressed' : '#333333', }
-
-          #self.buttonSurface = pygame.Surface((self.width, self.height))
+          self.buttonSurface = pygame.Surface((self.width, self.height))
           self.buttonRect = pygame.Rect(self.x, self.y, self.width, self.height)
           self.font = pygame.font.Font('/usr/share/fonts/TTF/JetBrainsMonoNLNerdFontPropo-Regular.ttf', 30)
           self.font_rendered = self.font.render(self.buttonText, True, (255,200,200))
@@ -71,58 +59,58 @@ class Button:
       def onclickFunction(self):
           subprocess.call(self.cmd, shell=True)
       def displayText(self):
-          if self.isSelected:
-              self.surface.blit(self.font_rendered_highlighted, self.buttonRect)
-          else:
-              self.surface.blit(self.font_rendered, self.buttonRect)
+        self.buttonSurface.fill((25,25,25))
+        self.layer.blit(self.buttonSurface, self.buttonRect)
+        if self.isSelected:
+          self.layer.blit(self.font_rendered_highlighted, self.buttonRect)
+        else:
+          self.layer.blit(self.font_rendered, self.buttonRect)
       def displayImage(self):
         if self.isSelected:
-            image = pygame.transform.smoothscale(self.buttonImage, (300,300))
-            self.surface.blit(image, (self.buttonRect.x -25, self.buttonRect.y -25))
+           image = pygame.transform.smoothscale(self.buttonImage, (300,300))
+           self.layer.blit(image, (self.buttonRect.x -25, self.buttonRect.y -25))
         else:
-            self.surface.blit(self.buttonImage, self.buttonRect)
+           self.layer.blit(self.buttonImage, self.buttonRect)
       def display(self):
-            if self.isImage:
-                self.displayImage()
-            else:
-                self.displayText()
+        if self.isImage:
+           self.displayImage()
+        else:
+           self.displayText()
 
             
 class Selection:
-    #find a way to pull in apps from a list
-    def __init__(self,  buttons) -> None:
+    def __init__(self) -> None:
         self.menus = Menus 
-        self.menu = appsMenu
-        self.buttons = buttons
-        self.buttonSelected = buttons[0]
-        self.x = buttons[0].buttonRect.x  
-        self.y = buttons[0].buttonRect.y 
-        self.width = 20 
-        self.height = 30 
-        self.selectionRect = pygame.Rect(self.x, self.y, self.width, self.height)
+        self.menuSelected = appsMenu 
+        self.buttonSelected = self.menuSelected.buttons[0] 
+        self.x = self.buttonSelected.buttonRect.x  
+        self.y = self.buttonSelected.buttonRect.y 
+        self.width = 25 
+        self.height = 25 
+         
         # adding a selection surface is to get a visual of what it is selcting this should 
         # able to comment out in production
-        self.selectionSurface = pygame.Surface((self.width, self.height))
-        self.selectionSurface.fill((100, 100, 100))
+        self.surface = pygame.Surface((self.width, self.height))
+        self.selectionRect = pygame.Rect(self.x, self.y, self.width, self.height) 
+        self.surface.fill((100, 100, 100))
+        self.isMoving = False
 
+    # look for button or menu that the selection is over. if no button was selected return false
     def select(self):
         isThereAButton = False
-        for Menu in self.menus:
-            if Menu.menuRect.contains(self.selectionRect):
-                self.menu = Menu 
-        for Button in self.buttons:
+
+        for Button in self.menuSelected.buttons:
+            Button.isSelected = False
             if Button.buttonRect.contains(self.selectionRect):
                 isThereAButton = True 
-                Button.isSelected = True
-                self.buttonSelected = Button 
-            else:
-                Button.isSelected = False
+                self.buttonSelected = Button
+        self.buttonSelected.isSelected = True
         return isThereAButton 
-         
 
-        
-    def moveSlection(self ):
-        self.select()
+   #listen for keys and run the move function adding 1 pixel to the appropriate direction
+    #define key mappings here
+    def moveSelection(self ):
+        self.menuSelected.surface.blit(self.surface, self.selectionRect)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 sys.exit()
@@ -132,9 +120,9 @@ class Selection:
                 if event.key == pygame.K_ESCAPE:
                     sys.exit()
                 if event.key == pygame.K_RIGHT:
-                    self.moving(1, 0, 0, 0)
+                    self.move('RIGHT')
                 if event.key == pygame.K_LEFT:
-                    self.moving(0, 1, 0, 0)
+                    self.move('LEFT')
                 if event.key == pygame.K_UP:
                     self.moving(0, 0, 1, 0)
                 if event.key == pygame.K_DOWN:
@@ -143,26 +131,57 @@ class Selection:
                         self.buttonSelected.onclickFunction()
     #move 1 pixel until a new button or the same button is reselected
     def moving(self, RIGHT, LEFT, UP, DOWN):
-        moving =True
-        tick = False 
-        while moving:
+        self.isMoving = True
+        deselectedOriginalButton = False 
+        while self.isMoving:
             if not self.select():
-                tick = True 
-            self.menu.surface.blit(self.selectionSurface, self.selectionRect)
+                deselectedOriginalButton = True
+            if deselectedOriginalButton and self.select():
+                self.selectionRect.x = self.buttonSelected.x 
+                self.selectionRect.y = self.buttonSelected.y
+                self.isMoving= False 
             self.selectionRect.x += RIGHT
             self.selectionRect.x -= LEFT
             self.selectionRect.y -= UP 
             self.selectionRect.y += DOWN
-            if self.selectionRect.x <= 0:
+            if self.selectionRect.x < 0:
                 self.selectionRect.x = resolutionWidth
             if self.selectionRect.x > resolutionWidth:
-                self.selectionRect.x = 1
+                self.selectionRect.x =0
             if self.selectionRect.y > resolutionHeight:
                 self.selectionRect.y = 1
-            if self.selectionRect.y <=0:
+            if self.selectionRect.y < 0:
                 self.selectionRect.y = resolutionHeight
-            if tick and self.select():
-                moving = False 
+    
+    def move(self, direction):
+        buttonIndex = self.menuSelected.buttons.index((self.buttonSelected))
+        menuIndex = self.menus.index((self.menuSelected))
+        self.buttonSelected.isSelected = False
+        if direction == 'RIGHT':
+            if buttonIndex + 1 < len(self.menuSelected.buttons):
+                if self.menuSelected == self.menus[0]:
+                    self.menuSelected = self.menus[1]
+                    self.buttonSelected = self.menuSelected.buttons[0]
+                else:
+                    self.buttonSelected  = self.menuSelected.buttons[buttonIndex + 1]
+            else:
+                self.buttonSelected = self.menuSelected.buttons[0]
+        if direction == 'LEFT':
+            if self.selectionRect.x == 25:
+                self.menuSelected = self.menus[0]
+                self.buttonSelected = self.menuSelected.buttons[0]
+            else:
+                self.buttonSelected  = self.menuSelected.buttons[buttonIndex -1]
+
+        self.selectionRect.x = self.buttonSelected.x
+        self.selectionRect.y = self.buttonSelected.y
+        self.buttonSelected.isSelected = True
+
+        
+        
+        
+            
+            
             
             
                         

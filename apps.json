@@ -1,5 +1,10 @@
 {
   "apps" : [
+    { 
+      "name" : "DailyWire", 
+      "image": "./Images/dailywire256.jpg", 
+      "cmd" : "librewolf"
+    },
     {
         "name" : "LibreWolf",
         "image" : "./Images/librewolf.png",
@@ -11,11 +16,6 @@
       "cmd" : "librewolf"
     },
     { 
-      "name" : "DailyWire", 
-      "image": "./Images/dailywire256.jpg", 
-      "cmd" : "librewolf"
-    },
-    { 
       "name" : "BentKey", 
       "image": "./Images/bent_key.png", 
       "cmd" : "librewolf"
@@ -24,6 +24,11 @@
       "name" : "BentKey", 
       "image": "./Images/bent_key.png", 
       "cmd" : "librewolf"
+    },
+    {
+      "name" : "AddApp",
+      "image": "./Assets/addApp.png",
+      "cmd": "AddApp"
     }
   ]
 }
