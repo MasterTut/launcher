@@ -11,7 +11,6 @@ resolutionHeight = 1080
 pygame.init()
 FPS = 60
 Music_Switch= False
-
 os.environ['SDL_VIDEO_CENTERED'] = '1'
 info = pygame.display.Info()
 #resolutionWidth, resolutionHight = info.current_w, info.current_h
@@ -98,7 +97,6 @@ class Selection:
     # look for button or menu that the selection is over. if no button was selected return false
     def select(self):
         isThereAButton = False
-
         for Button in self.menuSelected.buttons:
             Button.isSelected = False
             if Button.buttonRect.contains(self.selectionRect):
@@ -109,7 +107,7 @@ class Selection:
 
    #listen for keys and run the move function adding 1 pixel to the appropriate direction
     #define key mappings here
-    def moveSelection(self ):
+    def moveSelection(self):
         self.menuSelected.surface.blit(self.surface, self.selectionRect)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -155,7 +153,7 @@ class Selection:
     
     def move(self, direction):
         buttonIndex = self.menuSelected.buttons.index((self.buttonSelected))
-        menuIndex = self.menus.index((self.menuSelected))
+        # menuIndex = self.menus.index((self.menuSelected))
         self.buttonSelected.isSelected = False
         if direction == 'RIGHT':
             if buttonIndex + 1 < len(self.menuSelected.buttons):

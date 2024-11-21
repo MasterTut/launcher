@@ -15,11 +15,13 @@ background_position = (0, 0)
 addAppMenu = gui_objects.addAppMenu
 sideMenu = gui_objects.sideMenu
 appsMenu = gui_objects.appsMenu
-showAddAppMenu = False 
+hideAddAppMenu = gui_objects.Button(20, 20, 200,100, 'hideMenu')
+hideAddAppMenu.layer = addAppMenu.surface
+addAppMenu.buttons = [hideAddAppMenu]
 
-def addApp():
-    global showAddAppMenu
-    showAddAppMenu = not showAddAppMenu
+def showMenu():
+    gui_objects.Menus[1] = addAppMenu
+
 
 def importSideMenu():
     sideMenuList = ['Media', 'Settings']
@@ -43,7 +45,7 @@ def importApps():
             newButton.buttonImage = pygame.image.load(app['image'])
             newButton.buttonImage = pygame.transform.scale(newButton.buttonImage,(newButton.width,newButton.height))
             if newButton.buttonText == "AddApp":
-                newButton.onclickFunction = addApp
+                newButton.onclickFunction = showMenu 
             newButton.cmd = app['cmd']
             newButton.isImage = True
             newButton.layer = appsMenu.surface
@@ -77,8 +79,6 @@ def play_music():
 
 def updateMenus():
     for menu in gui_objects.Menus:
-        if menu.name == 'addApp' and showAddAppMenu == False:
-            continue
         canvas.blit(menu.surface, (menu.x, menu.y))
         menu.surface.fill((40,40,40))  
         for button in menu.buttons:
