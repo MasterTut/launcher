@@ -22,7 +22,6 @@ addAppMenu.buttons = [hideAddAppMenu]
 def showMenu():
     guiobjects.Menus[1] = addAppMenu
 
-
 def importSideMenu():
     sideMenuList = ['Media', 'Settings']
     height = 20

@@ -11,6 +11,8 @@ resolutionHeight = 1080
 pygame.init()
 FPS = 60
 Music_Switch= False
+mixer = pygame.mixer
+mixer.init()
 os.environ['SDL_VIDEO_CENTERED'] = '1'
 info = pygame.display.Info()
 #resolutionWidth, resolutionHight = info.current_w, info.current_h
@@ -79,6 +81,7 @@ class Button:
             
 class Selection:
     def __init__(self) -> None:
+        self.sound = mixer.Sound('./Assets/Sound/GUI/click.wav')
         self.menus = Menus 
         self.menuSelected = appsMenu 
         self.buttonSelected = self.menuSelected.buttons[0] 
@@ -118,17 +121,18 @@ class Selection:
                 if event.key == pygame.K_ESCAPE:
                     sys.exit()
                 if event.key == pygame.K_RIGHT:
-                    self.move('RIGHT')
+                    self.moveRightLeft('RIGHT')
                 if event.key == pygame.K_LEFT:
-                    self.move('LEFT')
+                    self.moveRightLeft('LEFT')
                 if event.key == pygame.K_UP:
-                    self.moving(0, 0, 1, 0)
+                    self.moveUpDown( 1, 0)
                 if event.key == pygame.K_DOWN:
-                    self.moving(0, 0, 0, 1)
+                    self.moveUpDown( 0, 1)
                 if event.key == pygame.K_RETURN:
                         self.buttonSelected.onclickFunction()
     #move 1 pixel until a new button or the same button is reselected
-    def moving(self, RIGHT, LEFT, UP, DOWN):
+    def moveUpDown(self, UP, DOWN):
+        self.sound.play()
         self.isMoving = True
         deselectedOriginalButton = False 
         while self.isMoving:
@@ -138,20 +142,15 @@ class Selection:
                 self.selectionRect.x = self.buttonSelected.x 
                 self.selectionRect.y = self.buttonSelected.y
                 self.isMoving= False 
-            self.selectionRect.x += RIGHT
-            self.selectionRect.x -= LEFT
             self.selectionRect.y -= UP 
             self.selectionRect.y += DOWN
-            if self.selectionRect.x < 0:
-                self.selectionRect.x = resolutionWidth
-            if self.selectionRect.x > resolutionWidth:
-                self.selectionRect.x =0
             if self.selectionRect.y > resolutionHeight:
                 self.selectionRect.y = 1
             if self.selectionRect.y < 0:
                 self.selectionRect.y = resolutionHeight
     
-    def move(self, direction):
+    def moveRightLeft(self, direction):
+        self.sound.play()
         buttonIndex = self.menuSelected.buttons.index((self.buttonSelected))
         # menuIndex = self.menus.index((self.menuSelected))
         self.buttonSelected.isSelected = False
@@ -175,7 +174,7 @@ class Selection:
         self.selectionRect.y = self.buttonSelected.y
         self.buttonSelected.isSelected = True
 
-        
+
         
         
             
