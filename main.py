@@ -1,9 +1,9 @@
 #!/usr/bin/python3
 import pygame 
-import gui_objects
+import guiobjects 
 import json
 #setup
-canvas = gui_objects.canvas
+canvas = guiobjects.canvas
 canvas.fill((30, 30, 30))
 pygame.display.set_caption("GameLauncher")
 clock = pygame.time.Clock()
@@ -12,22 +12,22 @@ background= pygame.image.load("./Images/background.png")
 background_position = (0, 0)
 
 #setup GUI
-addAppMenu = gui_objects.addAppMenu
-sideMenu = gui_objects.sideMenu
-appsMenu = gui_objects.appsMenu
-hideAddAppMenu = gui_objects.Button(20, 20, 200,100, 'hideMenu')
+addAppMenu = guiobjects.addAppMenu
+sideMenu = guiobjects.sideMenu
+appsMenu = guiobjects.appsMenu
+hideAddAppMenu = guiobjects.Button(20, 20, 200, 40, 'hideMenu')
 hideAddAppMenu.layer = addAppMenu.surface
 addAppMenu.buttons = [hideAddAppMenu]
 
 def showMenu():
-    gui_objects.Menus[1] = addAppMenu
+    guiobjects.Menus[1] = addAppMenu
 
 
 def importSideMenu():
     sideMenuList = ['Media', 'Settings']
     height = 20
     for button in sideMenuList:
-        sideMenuButton = gui_objects.Button(sideMenu.surface.get_width() * .1, height,150,40, button)
+        sideMenuButton = guiobjects.Button(sideMenu.surface.get_width() * .1, height,150,40, button)
         sideMenuButton.layer = sideMenu.surface 
         sideMenu.buttons.append(sideMenuButton)
         height += 50 
@@ -41,7 +41,7 @@ def importApps():
     with open('./apps.json', 'r') as apps:
         data = json.load(apps)
         for app in data['apps']:
-            newButton = gui_objects.Button(x, y,256,256, app['name'])
+            newButton = guiobjects.Button(x, y,256,256, app['name'])
             newButton.buttonImage = pygame.image.load(app['image'])
             newButton.buttonImage = pygame.transform.scale(newButton.buttonImage,(newButton.width,newButton.height))
             if newButton.buttonText == "AddApp":
@@ -62,11 +62,11 @@ def importApps():
 
 importApps()
 importSideMenu()
-selection = gui_objects.Selection()
+selection = guiobjects.Selection()
     
 
 def play_music():
-    Music_Switch = not gui_objects.Music_Switch
+    Music_Switch = not guiobjects.Music_Switch
     mixer = pygame.mixer
     mixer.init()
     mixer.music.load("./Sound/Music/space-trip.mp3")
@@ -78,7 +78,7 @@ def play_music():
 
 
 def updateMenus():
-    for menu in gui_objects.Menus:
+    for menu in guiobjects.Menus:
         canvas.blit(menu.surface, (menu.x, menu.y))
         menu.surface.fill((40,40,40))  
         for button in menu.buttons:
@@ -92,7 +92,7 @@ def updateCanvas():
 
 def gameLoop():
     while True:
-        clock.tick(gui_objects.FPS)
+        clock.tick(guiobjects.FPS)
         selection.moveSelection()
         updateCanvas()
 
