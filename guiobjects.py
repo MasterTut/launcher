@@ -7,17 +7,17 @@ BLACK = (255,255,255)
 
 resolutionWidth = 1920 
 resolutionHeight = 1080 
-
+mixer = pygame.mixer
+mixer.init()
 pygame.init()
 FPS = 60
 Music_Switch= False
-mixer = pygame.mixer
-mixer.init()
-os.environ['SDL_VIDEO_CENTERED'] = '1'
+# os.environ['SDL_VIDEO_CENTERED'] = '12'
 info = pygame.display.Info()
 #resolutionWidth, resolutionHight = info.current_w, info.current_h
 canvas = pygame.display.set_mode((resolutionWidth, resolutionHeight), pygame.RESIZABLE)
 background= pygame.image.load("./Images/background.png")
+appMenuImage = pygame.image.load("./Assets/appMenu.png")
 background_position = (0, 0)
 
 #Adding Menus

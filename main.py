@@ -4,7 +4,7 @@ import guiobjects
 import json
 #setup
 canvas = guiobjects.canvas
-canvas.fill((30, 30, 30))
+canvas.fill((30, 30, 50))
 pygame.display.set_caption("GameLauncher")
 clock = pygame.time.Clock()
 #Import Images 
@@ -79,7 +79,8 @@ def play_music():
 def updateMenus():
     for menu in guiobjects.Menus:
         canvas.blit(menu.surface, (menu.x, menu.y))
-        menu.surface.fill((40,40,40))  
+        menu.surface.fill((0,0,0))
+        menu.surface.set_alpha(20)
         for button in menu.buttons:
             button.display()
 

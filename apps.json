@@ -1,7 +1,7 @@
 {
   "apps" : [
     { 
-      "name" : "DailyWire", 
+      "name" : "SomeApp", 
       "image": "./Images/dailywire256.jpg", 
       "cmd" : "librewolf"
     },
@@ -11,17 +11,17 @@
         "cmd": "librewolf"
     },
     { 
-      "name" : "DailyWire", 
+      "name" : "SomeOtherApp", 
       "image": "./Images/dailywire256.jpg", 
       "cmd" : "librewolf"
     },
     { 
-      "name" : "BentKey", 
+      "name" : "AnotherApp", 
       "image": "./Images/bent_key.png", 
       "cmd" : "librewolf"
     },
     { 
-      "name" : "BentKey", 
+      "name" : "anotherApphere", 
       "image": "./Images/bent_key.png", 
       "cmd" : "librewolf"
     },
