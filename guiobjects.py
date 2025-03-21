@@ -16,7 +16,7 @@ Music_Switch= False
 info = pygame.display.Info()
 #resolutionWidth, resolutionHight = info.current_w, info.current_h
 canvas = pygame.display.set_mode((resolutionWidth, resolutionHeight), pygame.RESIZABLE)
-background= pygame.image.load("./Images/background.png")
+background= pygame.image.load("./Assets/background.png")
 appMenuImage = pygame.image.load("./Assets/appMenu.png")
 background_position = (0, 0)
 

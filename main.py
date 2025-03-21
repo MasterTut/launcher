@@ -8,7 +8,7 @@ canvas.fill((30, 30, 50))
 pygame.display.set_caption("GameLauncher")
 clock = pygame.time.Clock()
 #Import Images 
-background= pygame.image.load("./Images/background.png")
+background= pygame.image.load("./Assets/background.png")
 background_position = (0, 0)
 
 #setup GUI
