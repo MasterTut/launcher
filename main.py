@@ -32,7 +32,6 @@ def importSideMenu():
         height += 50 
     return sideMenu.buttons 
 
-
 def importApps():
     panding = 25
     x = panding 
@@ -59,11 +58,6 @@ def importApps():
                  x += newButton.width + panding
         return appsMenu.buttons 
 
-
-
-
-    
-
 def play_music():
     Music_Switch = not guiobjects.Music_Switch
     mixer = pygame.mixer
@@ -75,7 +69,6 @@ def play_music():
     elif not Music_Switch:
         mixer.music.stop()
 
-
 def updateMenus():
     for menu in guiobjects.Menus:
         canvas.blit(menu.surface, (menu.x, menu.y))
@@ -83,7 +76,6 @@ def updateMenus():
         menu.surface.set_alpha(20)
         for button in menu.buttons:
             button.display()
-
 
 def updateCanvas(): 
     # canvas.blit(background, dest = background_position) #uncomment to add background image
@@ -95,7 +87,6 @@ def gameLoop():
         clock.tick(guiobjects.FPS)
         selection.moveSelection()
         updateCanvas()
-
 
 #RUN
 if __name__ == "__main__":
