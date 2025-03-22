@@ -59,9 +59,9 @@ def importApps():
                  x += newButton.width + panding
         return appsMenu.buttons 
 
-importApps()
-importSideMenu()
-selection = guiobjects.Selection()
+
+
+
     
 
 def play_music():
@@ -99,5 +99,8 @@ def gameLoop():
 
 #RUN
 if __name__ == "__main__":
+    importApps()
+    importSideMenu()
+    selection = guiobjects.Selection()
     gameLoop()
     pygame.quit()
