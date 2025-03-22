@@ -10,7 +10,7 @@ resolutionHeight = 1080
 mixer = pygame.mixer
 mixer.init()
 pygame.init()
-FPS = 60
+FPS = 120
 Music_Switch= False
 # os.environ['SDL_VIDEO_CENTERED'] = '12'
 info = pygame.display.Info()
@@ -68,8 +68,8 @@ class Button:
           self.layer.blit(self.font_rendered, self.buttonRect)
       def displayImage(self):
         if self.isSelected:
-           image = pygame.transform.smoothscale(self.buttonImage, (300,300))
-           self.layer.blit(image, (self.buttonRect.x -25, self.buttonRect.y -25))
+            image = pygame.transform.smoothscale(self.buttonImage, (300,300))
+            self.layer.blit(image, (self.buttonRect.x -25, self.buttonRect.y -25))
         else:
            self.layer.blit(self.buttonImage, self.buttonRect)
       def display(self):
