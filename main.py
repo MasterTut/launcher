@@ -1,31 +1,17 @@
 #!/usr/bin/python3
 import pygame 
-from ui_components import * 
+from ui_components import *
+from add_app_menu import addAppMenu, toggleAddAppMenu
 import json
 #setup
 #canvas = guiobjects.canvas
 pygame.display.set_caption("TVLauncher")
 clock = pygame.time.Clock()
 
-
-
-# Add text fields and submit button
-name_field = TextField(50, 50, 500, 50, "Name")
-image_field = TextField(50, 120, 500, 50, "Image")
-cmd_field = TextField(50, 190, 500, 50, "Cmd")
-submit_button = Button(200, 260, 200, 50, "Submit")
-name_field.layer = addAppMenu.surface
-image_field.layer = addAppMenu.surface
-cmd_field.layer = addAppMenu.surface
-submit_button.layer = addAppMenu.surface
-submit_button.isImage = False  # Text button
-
-# Add to menu
-addAppMenu.buttons = [name_field, image_field, cmd_field, submit_button]
-addAppMenu.button_matrix = [[name_field], [image_field], [cmd_field], [submit_button]]  # 1 per row for form navigation
+Menus.append(addAppMenu)
 
 def showMenu():
-    guiobjects.Menus[1] = addAppMenu
+    Menus[1] = addAppMenu
 
 def importSideMenu():
     sideMenuList = ['Media', 'Settings']
@@ -45,6 +31,11 @@ def importApps():
     buttons_per_row = max_width // (button_width + padding)
     
     # Load JSON
+    if not os.path.exists('./apps.json'):
+        print("apps.json not found, creating a default file.")
+        default_data = {"apps": [{"name": "defaultApp", "image": "./Assets/defaultApp.png", "cmd": "echo 'hello'"}]}
+        with open('./apps.json', 'w') as f:
+            json.dump(default_data, f, indent=2)
     with open('./apps.json', 'r') as apps:
         data = json.load(apps)
         apps_list = data['apps']
@@ -54,8 +45,7 @@ def importApps():
     rows = (total_buttons + buttons_per_row - 1) // buttons_per_row  # Ceiling division
     
     # Create a 2D matrix
-    button_matrix = [[] for _ in range(rows)]
-    button_flat_list = []  # Keep flat list for compatibility
+    appsMenu.button_matrix = button_matrix = [[] for _ in range(rows)]
     
     for i, app in enumerate(apps_list):
         row = i // buttons_per_row
@@ -66,18 +56,15 @@ def importApps():
         newButton = Button(x, y, button_width, button_height, app['name'])
         newButton.buttonImage = pygame.image.load(app['image'])
         newButton.buttonImage = pygame.transform.scale(newButton.buttonImage, (button_width, button_height))
-        if newButton.buttonText == "AddApp":
-            newButton.onclickFunction = showMenu 
+        if newButton.buttonText == "defaultApp":
+            newButton.onclickFunction = toggleAddAppMenu
         newButton.cmd = app['cmd']
         newButton.isImage = True
         newButton.layer = appsMenu.surface
         
-        button_matrix[row].append(newButton)
-        button_flat_list.append(newButton)
-    
-    # Assign to appsMenu
-    appsMenu.buttons = button_flat_list  # Keep flat list for now
-    appsMenu.button_matrix = button_matrix  # Add matrix for grid navigation
+        appsMenu.button_matrix[row].append(newButton)
+        appsMenu.buttons.append(newButton)
+   
     return appsMenu.buttons
 
 
@@ -95,12 +82,11 @@ def play_music():
 def updateMenus():
     # Draw appsMenu and sideMenu first
     for menu in Menus:
-        if menu.name != "addAppMenu":
-            menu.surface.fill((0, 0, 0, 0))
-            menu.surface.set_alpha(255)
-            for button in menu.buttons:
-                button.display()
-            menu.show_hide_toggle()
+        menu.surface.fill((0, 0, 0, 0))
+        menu.surface.set_alpha(255)
+        for button in menu.buttons:
+            button.display()
+        menu.display()
     
     # Draw addAppMenu on top if active
     if selection.menuSelected.name == "addAppMenu":
@@ -109,12 +95,12 @@ def updateMenus():
         addAppMenu.surface.set_alpha(255)
         for button in addAppMenu.buttons:
             button.display()
-        canvas.blit(addAppMenu.surface, (addAppMenu.x, addAppMenu.y))
+        Canvas.blit(addAppMenu.surface, (addAppMenu.x, addAppMenu.y))
 
 
 def updateCanvas():
     while True:
-        canvas.blit(background_img, dest = background_position) 
+        Canvas.blit(background_img, dest = background_position) 
         selection.moveSelection()
         updateMenus()
         clock.tick(FPS)

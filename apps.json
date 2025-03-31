@@ -1,45 +1,9 @@
 {
-  "apps" : [
-    { 
-      "name" : "SomeApp", 
-      "image": "./Assets/addApp.png", 
-      "cmd" : "librewolf"
-    },
+  "apps": [
     {
-        "name" : "LibreWolf",
-        "image" : "./Assets/addApp.png",
-        "cmd": "librewolf"
-    },
-    {
-        "name" : "LibreWolf",
-        "image" : "./Assets/addApp.png",
-        "cmd": "librewolf"
-    },
-    {
-	"name" : "LibreWolf",
-	"image" : "./Assets/addApp.png",
-	"cmd": "librewolf"	
-    },
-
-    { 
-      "name" : "SomeApp", 
-      "image": "./Assets/addApp.png", 
-      "cmd" : "librewolf"
-    },
-    {
-        "name" : "LibreWolf",
-        "image" : "./Assets/addApp.png",
-        "cmd": "librewolf"
-    },
-    {
-        "name" : "LibreWolf",
-        "image" : "./Assets/addApp.png",
-        "cmd": "librewolf"
-    },
-    {
-	"name" : "LibreWolf",
-	"image" : "./Assets/addApp.png",
-	"cmd": "librewolf"	
+      "name": "defaultApp",
+      "image": "./Assets/defaultApp.png",
+      "cmd": "echo 'hello'"
     }
   ]
 }
