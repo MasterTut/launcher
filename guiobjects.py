@@ -130,8 +130,6 @@ class Selection:
                     self.moveUpDown( 'DOWN')
                 if event.key == pygame.K_RETURN:
                         self.buttonSelected.onclickFunction()
-    
-        
     def moveUpDown(self, direction):
         if not self.menuSelected.buttons or not hasattr(self.menuSelected, 'button_matrix'):
             print("No buttons or matrix in menu!")
@@ -141,33 +139,47 @@ class Selection:
         # Find current row/col
         buttonIndex = self.menuSelected.buttons.index(self.buttonSelected)
         buttons_per_row = len(self.menuSelected.button_matrix[0])  # Assume row 0 is full
+        total_rows = len(self.menuSelected.button_matrix)
         row = buttonIndex // buttons_per_row
         col = buttonIndex % buttons_per_row
         
         print(f"Menu: {self.menuSelected.name}")
-        print(f"Current row: {row}, col: {col}, Total rows: {len(self.menuSelected.button_matrix)}")
+        print(f"Current row: {row}, col: {col}, Total rows: {total_rows}")
         print(f"Current button position: ({self.buttonSelected.buttonRect.x}, {self.buttonSelected.buttonRect.y})")
         print(f"Direction received: {direction}")
         
         self.buttonSelected.isSelected = False
-        if direction == 'UP' and row > 0:
-            row -= 1
+        if direction == 'UP':
+            if row > 0:
+                row -= 1  # Move up normally
+                print(f"Moving UP to row {row}, col {col}")
+            else:
+                row = total_rows - 1  # Wrap to bottom
+                print(f"Wrapping UP to row {row}, col {col}")
             if col < len(self.menuSelected.button_matrix[row]):  # Check column exists
                 self.buttonSelected = self.menuSelected.button_matrix[row][col]
-                print(f"Moving UP to row {row}, col {col}")
-        elif direction == 'DOWN' and row + 1 < len(self.menuSelected.button_matrix):
-            row += 1
-            if col < len(self.menuSelected.button_matrix[row]):
-                self.buttonSelected = self.menuSelected.button_matrix[row][col]
+            else:
+                self.buttonSelected = self.menuSelected.button_matrix[row][-1]  # Last in row if col too big
+        elif direction == 'DOWN':
+            if row + 1 < total_rows:
+                row += 1  # Move down normally
                 print(f"Moving DOWN to row {row}, col {col}")
+            else:
+                row = 0  # Wrap to top
+                print(f"Wrapping DOWN to row {row}, col {col}")
+            if col < len(self.menuSelected.button_matrix[row]):  # Check column exists
+                self.buttonSelected = self.menuSelected.button_matrix[row][col]
+            else:
+                self.buttonSelected = self.menuSelected.button_matrix[row][-1]  # Last in row if col too big
         else:
-            print(f"Cannot move {direction}: at boundary (row {row}, col {col})")
+            print(f"Invalid direction: {direction}")
+            return
         
         self.selectionRect.x = self.buttonSelected.buttonRect.x
         self.selectionRect.y = self.buttonSelected.buttonRect.y
         self.buttonSelected.isSelected = True
         print(f"New selection position: ({self.selectionRect.x}, {self.selectionRect.y})") 
-            
+        
             
     def moveRightLeft(self, direction):
         if not self.menuSelected.buttons or not hasattr(self.menuSelected, 'button_matrix'):
