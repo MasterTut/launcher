@@ -1,23 +1,28 @@
 #!/usr/bin/python3
 import pygame 
-import guiobjects 
+from ui_components import * 
 import json
 #setup
-canvas = guiobjects.canvas
-canvas.fill((30, 30, 50))
-pygame.display.set_caption("GameLauncher")
+#canvas = guiobjects.canvas
+pygame.display.set_caption("TVLauncher")
 clock = pygame.time.Clock()
-#Import Images 
-background= pygame.image.load("./Assets/background.png")
-background_position = (0, 0)
 
-#setup GUI
-addAppMenu = guiobjects.addAppMenu
-sideMenu = guiobjects.sideMenu
-appsMenu = guiobjects.appsMenu
-hideAddAppMenu = guiobjects.Button(20, 20, 200, 40, 'hideMenu')
-hideAddAppMenu.layer = addAppMenu.surface
-addAppMenu.buttons = [hideAddAppMenu]
+
+
+# Add text fields and submit button
+name_field = TextField(50, 50, 500, 50, "Name")
+image_field = TextField(50, 120, 500, 50, "Image")
+cmd_field = TextField(50, 190, 500, 50, "Cmd")
+submit_button = Button(200, 260, 200, 50, "Submit")
+name_field.layer = addAppMenu.surface
+image_field.layer = addAppMenu.surface
+cmd_field.layer = addAppMenu.surface
+submit_button.layer = addAppMenu.surface
+submit_button.isImage = False  # Text button
+
+# Add to menu
+addAppMenu.buttons = [name_field, image_field, cmd_field, submit_button]
+addAppMenu.button_matrix = [[name_field], [image_field], [cmd_field], [submit_button]]  # 1 per row for form navigation
 
 def showMenu():
     guiobjects.Menus[1] = addAppMenu
@@ -26,37 +31,55 @@ def importSideMenu():
     sideMenuList = ['Media', 'Settings']
     height = 20
     for button in sideMenuList:
-        sideMenuButton = guiobjects.Button(sideMenu.surface.get_width() * .1, height,150,40, button)
+        sideMenuButton = Button(sideMenu.surface.get_width() * .1, height,150,40, button)
         sideMenuButton.layer = sideMenu.surface 
         sideMenu.buttons.append(sideMenuButton)
         height += 50 
     return sideMenu.buttons 
 
 def importApps():
-    panding = 25
-    x = panding 
-    y = panding 
+    padding = 25
+    button_width = 256
+    button_height = 256
+    max_width = appsMenu.surface.get_width() - padding
+    buttons_per_row = max_width // (button_width + padding)
+    
+    # Load JSON
     with open('./apps.json', 'r') as apps:
         data = json.load(apps)
-        for app in data['apps']:
-            newButton = guiobjects.Button(x, y,256,256, app['name'])
-            newButton.buttonImage = pygame.image.load(app['image'])
-            newButton.buttonImage = pygame.transform.scale(newButton.buttonImage,(newButton.width,newButton.height))
-            if newButton.buttonText == "AddApp":
-                newButton.onclickFunction = showMenu 
-            newButton.cmd = app['cmd']
-            newButton.isImage = True
-            newButton.layer = appsMenu.surface
-            appsMenu.buttons.append(newButton)
-            #after button is appended it adjusts the location
-            #location of apps are adjusted based on the surface area of appsMenu vs the window size
-            #the idea is more consistancy dispite window size
-            if x > (appsMenu.surface.get_width() -newButton.width*2 + panding ):
-                 y += newButton.height + panding 
-                 x = panding 
-            else:
-                 x += newButton.width + panding
-        return appsMenu.buttons 
+        apps_list = data['apps']
+    
+    # Calculate grid dimensions
+    total_buttons = len(apps_list)
+    rows = (total_buttons + buttons_per_row - 1) // buttons_per_row  # Ceiling division
+    
+    # Create a 2D matrix
+    button_matrix = [[] for _ in range(rows)]
+    button_flat_list = []  # Keep flat list for compatibility
+    
+    for i, app in enumerate(apps_list):
+        row = i // buttons_per_row
+        col = i % buttons_per_row
+        x = padding + col * (button_width + padding)
+        y = padding + row * (button_height + padding)
+        
+        newButton = Button(x, y, button_width, button_height, app['name'])
+        newButton.buttonImage = pygame.image.load(app['image'])
+        newButton.buttonImage = pygame.transform.scale(newButton.buttonImage, (button_width, button_height))
+        if newButton.buttonText == "AddApp":
+            newButton.onclickFunction = showMenu 
+        newButton.cmd = app['cmd']
+        newButton.isImage = True
+        newButton.layer = appsMenu.surface
+        
+        button_matrix[row].append(newButton)
+        button_flat_list.append(newButton)
+    
+    # Assign to appsMenu
+    appsMenu.buttons = button_flat_list  # Keep flat list for now
+    appsMenu.button_matrix = button_matrix  # Add matrix for grid navigation
+    return appsMenu.buttons
+
 
 def play_music():
     Music_Switch = not guiobjects.Music_Switch
@@ -70,28 +93,37 @@ def play_music():
         mixer.music.stop()
 
 def updateMenus():
-    for menu in guiobjects.Menus:
-        canvas.blit(menu.surface, (menu.x, menu.y))
-        menu.surface.fill((0,0,0))
-        menu.surface.set_alpha(20)
-        for button in menu.buttons:
+    # Draw appsMenu and sideMenu first
+    for menu in Menus:
+        if menu.name != "addAppMenu":
+            menu.surface.fill((0, 0, 0, 0))
+            menu.surface.set_alpha(255)
+            for button in menu.buttons:
+                button.display()
+            menu.show_hide_toggle()
+    
+    # Draw addAppMenu on top if active
+    if selection.menuSelected.name == "addAppMenu":
+        addAppMenu = selection.menuSelected
+        addAppMenu.surface.fill((50, 50, 50, 200) if addAppMenu.is_form else (0, 0, 0, 0))  # Semi-transparent for forms
+        addAppMenu.surface.set_alpha(255)
+        for button in addAppMenu.buttons:
             button.display()
+        canvas.blit(addAppMenu.surface, (addAppMenu.x, addAppMenu.y))
 
-def updateCanvas(): 
-    # canvas.blit(background, dest = background_position) #uncomment to add background image
-    updateMenus()
-    pygame.display.update()
 
-def gameLoop():
+def updateCanvas():
     while True:
-        clock.tick(guiobjects.FPS)
+        canvas.blit(background_img, dest = background_position) 
         selection.moveSelection()
-        updateCanvas()
+        updateMenus()
+        clock.tick(FPS)
+        pygame.display.update()
 
 #RUN
 if __name__ == "__main__":
     importApps()
     importSideMenu()
-    selection = guiobjects.Selection()
-    gameLoop()
+    selection = Selection()
+    updateCanvas()
     pygame.quit()
