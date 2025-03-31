@@ -80,7 +80,6 @@ def play_music():
         mixer.music.stop()
 
 def updateMenus():
-    # Draw appsMenu and sideMenu first
     for menu in Menus:
         menu.surface.fill((0, 0, 0, 0))
         menu.surface.set_alpha(255)
@@ -88,15 +87,6 @@ def updateMenus():
             button.display()
         menu.display()
     
-    # Draw addAppMenu on top if active
-    if selection.menuSelected.name == "addAppMenu":
-        addAppMenu = selection.menuSelected
-        addAppMenu.surface.fill((50, 50, 50, 200) if addAppMenu.is_form else (0, 0, 0, 0))  # Semi-transparent for forms
-        addAppMenu.surface.set_alpha(255)
-        for button in addAppMenu.buttons:
-            button.display()
-        Canvas.blit(addAppMenu.surface, (addAppMenu.x, addAppMenu.y))
-
 
 def updateCanvas():
     while True:
