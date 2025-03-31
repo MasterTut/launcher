@@ -18,7 +18,6 @@ info = pygame.display.Info()
 canvas = pygame.display.set_mode((resolutionWidth, resolutionHeight), pygame.RESIZABLE)
 background_img= pygame.image.load("./Assets/background.png").convert()
 background_img = pygame.transform.scale(background_img, (resolutionWidth, resolutionHeight))
-appMenuImage = pygame.image.load("./Assets/appMenu.png")
 background_position = (0, 0)
 
 #Adding Menus
@@ -48,11 +47,11 @@ class Button:
           self.buttonText = buttonText
           self.isImage = False
           self.buttonImage = pygame.image.load("./Assets/testing.png")
-          self.layer = pygame.Surface((self.width,self.height))  
+          self.layer = None # Will be set to menu.surface in importApps 
           self.cmd = "echo " + self.buttonText
           self.isSelected = False
           self.fillColors = { 'normal' : '#ffffff', 'hover' : '#666666',  'pressed' : '#333333', }
-          self.buttonSurface = pygame.Surface((self.width, self.height))
+          self.buttonSurface = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
           self.buttonRect = pygame.Rect(self.x, self.y, self.width, self.height)
           self.font = pygame.font.Font('/usr/share/fonts/TTF/JetBrainsMonoNLNerdFontPropo-Regular.ttf', 30)
           self.font_rendered = self.font.render(self.buttonText, True, (255,200,200))
@@ -61,13 +60,15 @@ class Button:
       def onclickFunction(self):
           subprocess.call(self.cmd, shell=True)
       def displayText(self):
-        self.buttonSurface.fill((25,25,25))
+        self.buttonSurface.fill((0,0,0,0))
         self.layer.blit(self.buttonSurface, self.buttonRect)
         if self.isSelected:
           self.layer.blit(self.font_rendered_highlighted, self.buttonRect)
         else:
           self.layer.blit(self.font_rendered, self.buttonRect)
       def displayImage(self):
+        self.buttonSurface.fill((0,0,0,0))
+        self.layer.blit(self.buttonSurface, (0, 0))
         if self.isSelected:
             image = pygame.transform.smoothscale(self.buttonImage, (300,300))
             self.layer.blit(image, (self.buttonRect.x -25, self.buttonRect.y -25))
