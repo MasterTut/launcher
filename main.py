@@ -33,30 +33,48 @@ def importSideMenu():
     return sideMenu.buttons 
 
 def importApps():
-    panding = 25
-    x = panding 
-    y = panding 
+    padding = 25
+    button_width = 256
+    button_height = 256
+    max_width = appsMenu.surface.get_width() - padding
+    buttons_per_row = max_width // (button_width + padding)
+    
+    # Load JSON
     with open('./apps.json', 'r') as apps:
         data = json.load(apps)
-        for app in data['apps']:
-            newButton = guiobjects.Button(x, y,256,256, app['name'])
-            newButton.buttonImage = pygame.image.load(app['image'])
-            newButton.buttonImage = pygame.transform.scale(newButton.buttonImage,(newButton.width,newButton.height))
-            if newButton.buttonText == "AddApp":
-                newButton.onclickFunction = showMenu 
-            newButton.cmd = app['cmd']
-            newButton.isImage = True
-            newButton.layer = appsMenu.surface
-            appsMenu.buttons.append(newButton)
-            #after button is appended it adjusts the location
-            #location of apps are adjusted based on the surface area of appsMenu vs the window size
-            #the idea is more consistancy dispite window size
-            if x > (appsMenu.surface.get_width() -newButton.width*2 + panding ):
-                 y += newButton.height + panding 
-                 x = panding 
-            else:
-                 x += newButton.width + panding
-        return appsMenu.buttons 
+        apps_list = data['apps']
+    
+    # Calculate grid dimensions
+    total_buttons = len(apps_list)
+    rows = (total_buttons + buttons_per_row - 1) // buttons_per_row  # Ceiling division
+    
+    # Create a 2D matrix
+    button_matrix = [[] for _ in range(rows)]
+    button_flat_list = []  # Keep flat list for compatibility
+    
+    for i, app in enumerate(apps_list):
+        row = i // buttons_per_row
+        col = i % buttons_per_row
+        x = padding + col * (button_width + padding)
+        y = padding + row * (button_height + padding)
+        
+        newButton = guiobjects.Button(x, y, button_width, button_height, app['name'])
+        newButton.buttonImage = pygame.image.load(app['image'])
+        newButton.buttonImage = pygame.transform.scale(newButton.buttonImage, (button_width, button_height))
+        if newButton.buttonText == "AddApp":
+            newButton.onclickFunction = showMenu 
+        newButton.cmd = app['cmd']
+        newButton.isImage = True
+        newButton.layer = appsMenu.surface
+        
+        button_matrix[row].append(newButton)
+        button_flat_list.append(newButton)
+    
+    # Assign to appsMenu
+    appsMenu.buttons = button_flat_list  # Keep flat list for now
+    appsMenu.button_matrix = button_matrix  # Add matrix for grid navigation
+    return appsMenu.buttons
+
 
 def play_music():
     Music_Switch = not guiobjects.Music_Switch

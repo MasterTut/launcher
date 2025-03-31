@@ -9,6 +9,37 @@
         "name" : "LibreWolf",
         "image" : "./Assets/addApp.png",
         "cmd": "librewolf"
+    },
+    {
+        "name" : "LibreWolf",
+        "image" : "./Assets/addApp.png",
+        "cmd": "librewolf"
+    },
+    {
+	"name" : "LibreWolf",
+	"image" : "./Assets/addApp.png",
+	"cmd": "librewolf"	
+    },
+
+    { 
+      "name" : "SomeApp", 
+      "image": "./Assets/addApp.png", 
+      "cmd" : "librewolf"
+    },
+    {
+        "name" : "LibreWolf",
+        "image" : "./Assets/addApp.png",
+        "cmd": "librewolf"
+    },
+    {
+        "name" : "LibreWolf",
+        "image" : "./Assets/addApp.png",
+        "cmd": "librewolf"
+    },
+    {
+	"name" : "LibreWolf",
+	"image" : "./Assets/addApp.png",
+	"cmd": "librewolf"	
     }
   ]
 }
