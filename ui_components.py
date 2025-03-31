@@ -2,23 +2,25 @@ import pygame
 import subprocess
 import os
 import sys
-#create gui canvas
-BLACK = (255,255,255)
+#initalizing 
+Mixer = pygame.mixer
+Mixer.init()
+pygame.init()
 
+#Settings
 resolutionWidth = 1920 
 resolutionHeight = 1080 
-mixer = pygame.mixer
-mixer.init()
-pygame.init()
+
 FPS = 120
 Music_Switch= False
 # os.environ['SDL_VIDEO_CENTERED'] = '12'
 info = pygame.display.Info()
 #resolutionWidth, resolutionHight = info.current_w, info.current_h
-canvas = pygame.display.set_mode((resolutionWidth, resolutionHeight), pygame.RESIZABLE)
+Canvas = pygame.display.set_mode((resolutionWidth, resolutionHeight), pygame.RESIZABLE)
 background_img= pygame.image.load("./Assets/background.png").convert()
 background_img = pygame.transform.scale(background_img, (resolutionWidth, resolutionHeight))
 background_position = (0, 0)
+Font = pygame.font.Font('/usr/share/fonts/TTF/JetBrainsMonoNLNerdFontPropo-Regular.ttf', 30)
 
 #Adding Menus
 
@@ -35,13 +37,16 @@ class Menu:
         self.button_matrix = []
         self.is_form = False
         self.hide = False
-    def show_hide_toggle(self):
+    
+    def display(self):
         if self.hide == False:
-            canvas.blit(self.surface, (self.x, self.y))
+            Canvas.blit(self.surface, (self.x, self.y))
+    def toggleDisplay(self):
+        self.hide = not self.hide
+            
 
-addAppMenu = Menu(canvas.get_width() * .19, 20, 1500, 1000, "addApp")
-appsMenu = Menu(canvas.get_width() * .19, 0, 1500, canvas.get_height(),'appsMenu')
-sideMenu = Menu(0, 0, 200, canvas.get_height(),"sideMenu")
+appsMenu = Menu(Canvas.get_width() * .19, 0, 1500, Canvas.get_height(),'appsMenu')
+sideMenu = Menu(0, 0, 200, Canvas.get_height(),"sideMenu")
 Menus = [ sideMenu, appsMenu ]
 
 class TextField:
@@ -54,13 +59,9 @@ class TextField:
         self.text = default_text
         self.isSelected = False
         self.buttonRect = pygame.Rect(self.x, self.y, self.width, self.height)
-        self.font = pygame.font.Font('/usr/share/fonts/TTF/JetBrainsMonoNLNerdFontPropo-Regular.ttf', 20)
+        self.font = Font 
         self.layer = None  # Will be set to menu.surface
         self.is_editing = False  # Track if we're typing
-    
-    
-    
-
 
     def display(self):
         if self.layer is None:
@@ -104,7 +105,7 @@ class Button:
           self.fillColors = { 'normal' : '#ffffff', 'hover' : '#666666',  'pressed' : '#333333', }
           self.buttonSurface = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
           self.buttonRect = pygame.Rect(self.x, self.y, self.width, self.height)
-          self.font = pygame.font.Font('/usr/share/fonts/TTF/JetBrainsMonoNLNerdFontPropo-Regular.ttf', 30)
+          self.font = Font 
           self.font_rendered = self.font.render(self.buttonText, True, (255,200,200))
           self.font_rendered_highlighted = self.font.render(self.buttonText, True, (255, 255, 200))
           self.highlighted = False
@@ -138,7 +139,7 @@ class Button:
             
 class Selection:
     def __init__(self) -> None:
-        self.sound = mixer.Sound('./Assets/Sound/GUI/click.wav')
+        self.sound = Mixer.Sound('./Assets/Sound/GUI/click.wav')
         self.menus = Menus 
         self.menuSelected = appsMenu 
         self.buttonSelected = self.menuSelected.buttons[0] 
