@@ -4,12 +4,12 @@ import guiobjects
 import json
 #setup
 canvas = guiobjects.canvas
-canvas.fill((30, 30, 50))
+canvas.blit(guiobjects.background_img, dest = guiobjects.background_position) 
+#canvas.fill((30, 30, 50))
 pygame.display.set_caption("GameLauncher")
 clock = pygame.time.Clock()
 #Import Images 
-background= pygame.image.load("./Assets/background.png")
-background_position = (0, 0)
+
 
 #setup GUI
 addAppMenu = guiobjects.addAppMenu
@@ -90,21 +90,21 @@ def play_music():
 def updateMenus():
     for menu in guiobjects.Menus:
         canvas.blit(menu.surface, (menu.x, menu.y))
-        menu.surface.fill((0,0,0))
+        menu.surface.fill((0,0,0,0))
         menu.surface.set_alpha(20)
         for button in menu.buttons:
             button.display()
 
-def updateCanvas(): 
-    # canvas.blit(background, dest = background_position) #uncomment to add background image
+def updateCanvas():
+    #canvas.blit(guiobjects.background_img, dest = background_position) 
     updateMenus()
     pygame.display.update()
 
 def gameLoop():
     while True:
+        updateCanvas()
         clock.tick(guiobjects.FPS)
         selection.moveSelection()
-        updateCanvas()
 
 #RUN
 if __name__ == "__main__":

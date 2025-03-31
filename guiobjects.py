@@ -16,7 +16,8 @@ Music_Switch= False
 info = pygame.display.Info()
 #resolutionWidth, resolutionHight = info.current_w, info.current_h
 canvas = pygame.display.set_mode((resolutionWidth, resolutionHeight), pygame.RESIZABLE)
-background= pygame.image.load("./Assets/background.png")
+background_img= pygame.image.load("./Assets/background.png").convert()
+background_img = pygame.transform.scale(background_img, (resolutionWidth, resolutionHeight))
 appMenuImage = pygame.image.load("./Assets/appMenu.png")
 background_position = (0, 0)
 
@@ -29,7 +30,7 @@ class Menu:
         self.y = y 
         self.width = width 
         self.height = height
-        self.surface = pygame.Surface((self.width,self.height)) 
+        self.surface = pygame.Surface((self.width,self.height), pygame.SRCALPHA) 
         self.menuRect = self.surface.get_rect()
         self.buttons = []
 
