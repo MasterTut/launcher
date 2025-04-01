@@ -19,8 +19,10 @@ def importSideMenu():
     for button in sideMenuList:
         sideMenuButton = Button(sideMenu.surface.get_width() * .1, height,150,40, button)
         sideMenuButton.layer = sideMenu.surface 
+        
         sideMenu.buttons.append(sideMenuButton)
-        height += 50 
+        height += 50
+    sideMenu.button_matrix[0] = sideMenu.buttons
     return sideMenu.buttons 
 
 def importApps():
@@ -45,7 +47,7 @@ def importApps():
     rows = (total_buttons + buttons_per_row - 1) // buttons_per_row  # Ceiling division
     
     # Create a 2D matrix
-    appsMenu.button_matrix = button_matrix = [[] for _ in range(rows)]
+    appsMenu.button_matrix = [[] for _ in range(rows)]
     
     for i, app in enumerate(apps_list):
         row = i // buttons_per_row

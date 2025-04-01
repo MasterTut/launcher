@@ -17,7 +17,7 @@ Music_Switch= False
 info = pygame.display.Info()
 #resolutionWidth, resolutionHight = info.current_w, info.current_h
 Canvas = pygame.display.set_mode((resolutionWidth, resolutionHeight), pygame.RESIZABLE)
-background_img= pygame.image.load("./Assets/background.png").convert()
+background_img= pygame.image.load("./Assets/background2.jpg").convert()
 background_img = pygame.transform.scale(background_img, (resolutionWidth, resolutionHeight))
 background_position = (0, 0)
 Font = pygame.font.Font('/usr/share/fonts/TTF/JetBrainsMonoNLNerdFontPropo-Regular.ttf', 30)
@@ -34,7 +34,7 @@ class Menu:
         self.surface = pygame.Surface((self.width,self.height), pygame.SRCALPHA) 
         self.menuRect = self.surface.get_rect()
         self.buttons = []
-        self.button_matrix = []
+        self.button_matrix = [[]]
         self.is_form = False
         self.hide = False
     
@@ -189,10 +189,31 @@ class Selection:
                 if event.key == pygame.K_RETURN:
                         self.buttonSelected.onclickFunction()
     def moveUpDown(self, direction):
-        if not self.menuSelected.buttons or not hasattr(self.menuSelected, 'button_matrix'):
-            print("No buttons or matrix in menu!")
+        self.buttonSelected.isSelected = False
+        if not self.menuSelected.buttons:
+            print("No Buttons in menu!")
             return
         self.sound.play()
+        #Handle up down side Menu 
+        if self.menuSelected.name == "sideMenu":
+            buttonIndex = self.menuSelected.buttons.index(self.buttonSelected)
+            total_buttons = len(self.menuSelected.buttons)
+            if direction == 'UP':
+                if buttonIndex > 0:
+                    buttonIndex -= 1  # Move up in the list
+                else:
+                    buttonIndex = total_buttons - 1  # Wrap to the bottom
+            elif direction == 'DOWN':
+                if buttonIndex + 1 < total_buttons:
+                    buttonIndex += 1  # Move down in the list
+                else:
+                    buttonIndex = 0  # Wrap to the top
+
+            self.buttonSelected = self.menuSelected.buttons[buttonIndex]
+            self.selectionRect.x = self.buttonSelected.buttonRect.x + self.menuSelected.x
+            self.selectionRect.y = self.buttonSelected.buttonRect.y + self.menuSelected.y
+            self.buttonSelected.isSelected = True
+            return
         
         # Find current row/col
         buttonIndex = self.menuSelected.buttons.index(self.buttonSelected)
@@ -201,12 +222,6 @@ class Selection:
         row = buttonIndex // buttons_per_row
         col = buttonIndex % buttons_per_row
         
-        print(f"Menu: {self.menuSelected.name}")
-        print(f"Current row: {row}, col: {col}, Total rows: {total_rows}")
-        print(f"Current button position: ({self.buttonSelected.buttonRect.x}, {self.buttonSelected.buttonRect.y})")
-        print(f"Direction received: {direction}")
-        
-        self.buttonSelected.isSelected = False
         if direction == 'UP':
             if row > 0:
                 row -= 1  # Move up normally
@@ -240,6 +255,7 @@ class Selection:
         
             
     def moveRightLeft(self, direction):
+        self.buttonSelected .isSelected = False
         if not self.menuSelected.buttons or not hasattr(self.menuSelected, 'button_matrix'):
             print("No buttons or matrix in menu!")
             return
@@ -249,17 +265,31 @@ class Selection:
         buttons_per_row = len(self.menuSelected.button_matrix[0])
         row = buttonIndex // buttons_per_row
         col = buttonIndex % buttons_per_row
-        
-        self.buttonSelected.isSelected = False
+        if self.menuSelected.name == "sideMenu":
+            
+            if direction == 'RIGHT':
+                #Immedialty switch to appMenu
+                self.menuSelected = self.menus[1]
+                self.buttonSelected = self.menuSelected.buttons[0]
+            elif direction == 'LEFT':
+                pass
+ 
         if direction == 'RIGHT' and col + 1 < len(self.menuSelected.button_matrix[row]):
             col += 1
             self.buttonSelected = self.menuSelected.button_matrix[row][col]
         elif direction == 'LEFT' and col > 0:
             col -= 1
             self.buttonSelected = self.menuSelected.button_matrix[row][col]
-        elif direction == 'LEFT' and col == 0 and self.menuSelected == self.menus[1]:  # Switch to sideMenu
+        elif direction == 'LEFT' and col == 0 and self.menuSelected == self.menus[1]:  
+            # Switch to sideMenu
             self.menuSelected = self.menus[0]
             self.buttonSelected = self.menuSelected.buttons[0]
+        elif direction == 'RIGHT' and col + 1 >= len(self.menuSelected.button_matrix[row]):
+            # Wrap to first column in AppMenu
+            col = 0
+            self.menuSelected = self.menus[1]
+            self.buttonSelected = self.menuSelected.button_matrix[row][col]
+        print(self.menuSelected.name)
         self.selectionRect.x = self.buttonSelected.buttonRect.x
         self.selectionRect.y = self.buttonSelected.buttonRect.y
         self.buttonSelected.isSelected = True        

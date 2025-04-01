@@ -4,6 +4,21 @@
       "name": "defaultApp",
       "image": "./Assets/defaultApp.png",
       "cmd": "echo 'hello'"
+    },
+    {
+      "name": "defaultApp",                
+      "image": "./Assets/defaultApp.png",
+      "cmd": "echo 'hello'"
+    },
+    {
+      "name": "defaultApp",                
+      "image": "./Assets/defaultApp.png",
+      "cmd": "echo 'hello'"
+    },
+    {
+      "name": "defaultApp",                
+      "image": "./Assets/defaultApp.png",
+      "cmd": "echo 'hello'"
     }
   ]
 }
