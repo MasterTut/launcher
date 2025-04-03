@@ -112,7 +112,6 @@ class Selection:
     #define key mappings here
     def moveSelection(self):
         for event in pygame.event.get():
-            print(self.menuSelected.name)
             if event.type == pygame.QUIT:
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:

@@ -6,7 +6,7 @@ import json
 pygame.display.set_caption(NAME)
 clock = pygame.time.Clock()
 
-#Define Menus
+#Define Default Menus
 defaultMenu = Menu(Canvas.get_width() * .19, 0, 1500, Canvas.get_height(),'defaultMenu')
 addAppsMenu = Menu(Canvas.get_width() * .19, 0, 1500, Canvas.get_height(),'addAppsMenu')
 sideMenu = Menu(0, 0, 200, Canvas.get_height(),"sideMenu")
@@ -17,20 +17,7 @@ def showAddAppsMenu():
     activeMenus[1] = addAppsMenu
 
 
-#Import Buttons to be displayed on Menus
-
-def importSettingsMenu():
-    settingsMenuList = [ 'AddApp', 'SomethingFun']
-    height =20
-    for button in settingsMenuList:
-        settingsMenuButton = Button(sideMenu.surface.get_width() * .1, height,150,40, button)
-        settingsMenuButton.layer = settingsMenu.surface 
-        settingsMenu.buttons.append(settingsMenuButton)
-        height += 50
-    settingsMenu.button_matrix[0] = sideMenu.buttons
-    settingsMenu.isList = True
-    return sideMenu.buttons 
-
+#The side menu(on right of screen) controls what is displayed on left of screen (apps Menu) 
 def importSideMenu(sideMenuList):
     height = 20
     for button in sideMenuList:
@@ -40,9 +27,8 @@ def importSideMenu(sideMenuList):
         height += 50
     sideMenu.button_matrix[0] = sideMenu.buttons
     sideMenu.isList = True
-    return sideMenu.buttons 
 
-#maybe re-Write this to include other menus
+#Creates app menus and buttons based file from root directory
 def importApps(menuFromFile):
     menuFromFile = Menu(Canvas.get_width() * .19, 0, 1500, Canvas.get_height(), menuFromFile)
     padding = 25
@@ -73,7 +59,6 @@ def importApps(menuFromFile):
         col = i % buttons_per_row
         x = padding + col * (button_width + padding)
         y = padding + row * (button_height + padding)
-        
         newButton = Button(x, y, button_width, button_height, app['name'])
         newButton.buttonImage = pygame.image.load(app['image'])
         newButton.buttonImage = pygame.transform.scale(newButton.buttonImage, (button_width, button_height))
@@ -82,12 +67,12 @@ def importApps(menuFromFile):
         newButton.cmd = app['cmd']
         newButton.isImage = True
         newButton.layer = menuFromFile.surface
-        
         menuFromFile.button_matrix[row].append(newButton)
         menuFromFile.buttons.append(newButton)
     Menus.append(menuFromFile) 
     return menuFromFile.buttons
 
+#Reads a json file from project root and creates menus 
 def importMenusFromFile():
     menusFromFile =[]
     with open('./apps.json', 'r') as apps:
@@ -95,14 +80,15 @@ def importMenusFromFile():
     for menu in data:
         importApps(menu)
         menusFromFile.append(menu)
-        importSideMenu(menusFromFile)
+    importSideMenu(menusFromFile)
     
-
+#Displays the App Menu on the right of screen when the sideMenu button is highlighted
 def processSideMenuSelect():
     for button in sideMenu.buttons:
         if button.isSelected:
             activeMenus[1] = next(( menu for menu in Menus if menu.name == button.buttonText), None)
 
+#Not using this function may implment as feature
 def play_music():
     Music_Switch = not guiobjects.Music_Switch
     mixer = pygame.mixer
@@ -114,16 +100,17 @@ def play_music():
     elif not Music_Switch:
         mixer.music.stop()
 
+#Displays Menus and the buttons on those menus
 def updateMenus():
     for menu in activeMenus:
-        if menu.name is not "sideMenu":
+        if menu.name != "sideMenu":
             menu.surface.fill((0, 0, 0, 25))
         menu.surface.set_alpha(255)
         for button in menu.buttons:
             button.display()
         menu.display()
     
-
+#Creates the game loop to update the screen
 def updateCanvas():
     while True:
         processSideMenuSelect()
@@ -133,10 +120,9 @@ def updateCanvas():
         clock.tick(FPS)
         pygame.display.update()
 
-#RUN
+#Initalize and run
 if __name__ == "__main__":
     importMenusFromFile()
-    #importSettingsMenu()
     selection = Selection(sideMenu, activeMenus)
     updateCanvas()
     pygame.quit()
