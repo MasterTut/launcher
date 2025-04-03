@@ -18,7 +18,7 @@ Music_Switch= False
 info = pygame.display.Info()
 #resolutionWidth, resolutionHight = info.current_w, info.current_h
 Canvas = pygame.display.set_mode((WINDOW_SIZE), pygame.RESIZABLE)
-background_img= pygame.image.load(BACKGROUND_IMAGE).convert()
+background_img  = pygame.image.load(BACKGROUND_IMAGE).convert()
 background_img = pygame.transform.scale(background_img, (resolutionWidth, resolutionHeight))
 background_position = (0, 0)
 Font = pygame.font.Font(FONT_PATH, FONT_SIZE)
@@ -45,11 +45,6 @@ class Menu:
             Canvas.blit(self.surface, (self.x, self.y))
     def toggleDisplay(self):
         self.hide = not self.hide
-            
-
-appsMenu = Menu(Canvas.get_width() * .19, 0, 1500, Canvas.get_height(),'appsMenu')
-sideMenu = Menu(0, 0, 200, Canvas.get_height(),"sideMenu")
-Menus = [ sideMenu, appsMenu ]
 
 
 class Button:
@@ -71,11 +66,7 @@ class Button:
           self.font_rendered = self.font.render(self.buttonText, True, (255,200,200))
           self.font_rendered_highlighted = self.font.render(self.buttonText, True, (255, 255, 200))
           self.highlighted = False
-          self.submit = None 
       def onclickFunction(self):
-        if self.submit:
-            self.submit()
-        else:
           subprocess.call(self.cmd, shell=True)
       def displayText(self):
         self.buttonSurface.fill((0,0,0,0))
@@ -100,10 +91,10 @@ class Button:
 
             
 class Selection:
-    def __init__(self) -> None:
-        self.sound = Mixer.Sound('./Assets/Sound/GUI/click.wav')
-        self.menus = Menus 
-        self.menuSelected = appsMenu 
+    def __init__(self, menuSelected, menus) -> None:
+        self.sound = Mixer.Sound(CLICK_SOUND)
+        self.menus = menus 
+        self.menuSelected = menuSelected 
         self.buttonSelected = self.menuSelected.buttons[0] 
         self.x = self.buttonSelected.buttonRect.x  
         self.y = self.buttonSelected.buttonRect.y 
@@ -117,20 +108,11 @@ class Selection:
         self.surface.fill((100, 100, 100))
         self.isMoving = False
 
-    # look for button or menu that the selection is over. if no button was selected return false
-    def select(self):
-        isThereAButton = False
-        for Button in self.menuSelected.buttons:
-            Button.isSelected = False
-            if Button.buttonRect.contains(self.selectionRect):
-                isThereAButton = True 
-                self.buttonSelected = Button
-        self.buttonSelected.isSelected = True
-        return isThereAButton 
 
     #define key mappings here
     def moveSelection(self):
         for event in pygame.event.get():
+            print(self.menuSelected.name)
             if event.type == pygame.QUIT:
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
@@ -228,9 +210,12 @@ class Selection:
         if self.menuSelected.name == "sideMenu":
             
             if direction == 'RIGHT':
-                #Immedialty switch to appMenu
-                self.menuSelected = self.menus[1]
-                self.buttonSelected = self.menuSelected.buttons[0]
+                #Immedialty switch to DisplayedMenu if there are buttons  
+                if len(self.menus[1].buttons) == 0:
+                    return 
+                else:
+                    self.menuSelected = self.menus[1]
+                    self.buttonSelected = self.menuSelected.buttons[0]
             elif direction == 'LEFT':
                 pass
  

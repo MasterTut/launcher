@@ -2,23 +2,24 @@
   "apps": [
     {
       "name": "defaultApp",
-      "image": "./Assets/defaultApp.png",
+      "image": "./Assets/Images/defaultApp.png",
       "cmd": "echo 'hello'"
     },
     {
       "name": "defaultApp",                
-      "image": "./Assets/defaultApp.png",
+      "image": "./Assets/Images/defaultApp.png",
       "cmd": "echo 'hello'"
     },
     {
       "name": "defaultApp",                
-      "image": "./Assets/defaultApp.png",
+      "image": "./Assets/Images/defaultApp.png",
       "cmd": "echo 'hello'"
     },
     {
       "name": "defaultApp",                
-      "image": "./Assets/defaultApp.png",
+      "image": "./Assets/Images/defaultApp.png",
       "cmd": "echo 'hello'"
     }
-  ]
+  ],
+  "settings": []
 }
