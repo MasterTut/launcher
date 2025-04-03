@@ -1,30 +1,49 @@
 #!/usr/bin/python3
 import pygame 
-from ui_components import *
-from add_app_menu import addAppMenu, toggleAddAppMenu
+from ui import *
 import json
 #setup
-#canvas = guiobjects.canvas
-pygame.display.set_caption("TVLauncher")
+pygame.display.set_caption(NAME)
 clock = pygame.time.Clock()
 
-Menus.append(addAppMenu)
+#Define Menus
+appsMenu = Menu(Canvas.get_width() * .19, 0, 1500, Canvas.get_height(),'appsMenu')
+addAppsMenu = Menu(Canvas.get_width() * .19, 0, 1500, Canvas.get_height(),'addAppsMenu')
+settingsMenu = Menu(Canvas.get_width() * .19, 0, 1500, Canvas.get_height(),'settingsMenu')
+sideMenu = Menu(0, 0, 200, Canvas.get_height(),"sideMenu")
+activeMenus = [ sideMenu, appsMenu ]
 
-def showMenu():
-    Menus[1] = addAppMenu
+def showAddAppsMenu():
+    activeMenus[1] = addAppsMenu
+
+
+#Import Buttons to be displayed on Menus
+
+def importSettingsMenu():
+    settingsMenuList = [ 'AddApp', 'SomethingFun']
+    height =20
+    for button in settingsMenuList:
+        settingsMenuButton = Button(sideMenu.surface.get_width() * .1, height,150,40, button)
+        settingsMenuButton.layer = settingsMenu.surface 
+        settingsMenu.buttons.append(settingsMenuButton)
+        height += 50
+    settingsMenu.button_matrix[0] = sideMenu.buttons
+    settingsMenu.isList = True
+    return sideMenu.buttons 
 
 def importSideMenu():
-    sideMenuList = ['Media', 'Settings']
+    sideMenuList = ['Apps', 'Settings']
     height = 20
     for button in sideMenuList:
         sideMenuButton = Button(sideMenu.surface.get_width() * .1, height,150,40, button)
         sideMenuButton.layer = sideMenu.surface 
-        
         sideMenu.buttons.append(sideMenuButton)
         height += 50
     sideMenu.button_matrix[0] = sideMenu.buttons
+    sideMenu.isList = True
     return sideMenu.buttons 
 
+#maybe re-Write this to include other menus
 def importApps():
     padding = 25
     button_width = 256
@@ -59,7 +78,7 @@ def importApps():
         newButton.buttonImage = pygame.image.load(app['image'])
         newButton.buttonImage = pygame.transform.scale(newButton.buttonImage, (button_width, button_height))
         if newButton.buttonText == "defaultApp":
-            newButton.onclickFunction = toggleAddAppMenu
+            newButton.onclickFunction = showAddAppsMenu
         newButton.cmd = app['cmd']
         newButton.isImage = True
         newButton.layer = appsMenu.surface
@@ -69,6 +88,13 @@ def importApps():
    
     return appsMenu.buttons
 
+def processSideMenuSelect():
+    for button in sideMenu.buttons:
+        if button.isSelected:
+            if button.buttonText == "Apps":
+                activeMenus[1] = appsMenu
+            if button.buttonText == "Settings":
+                activeMenus[1] = settingsMenu
 
 def play_music():
     Music_Switch = not guiobjects.Music_Switch
@@ -82,8 +108,9 @@ def play_music():
         mixer.music.stop()
 
 def updateMenus():
-    for menu in Menus:
-        menu.surface.fill((0, 0, 0, 0))
+    for menu in activeMenus:
+        if menu.name is not "sideMenu":
+            menu.surface.fill((0, 0, 0, 25))
         menu.surface.set_alpha(255)
         for button in menu.buttons:
             button.display()
@@ -92,6 +119,7 @@ def updateMenus():
 
 def updateCanvas():
     while True:
+        processSideMenuSelect()
         Canvas.blit(background_img, dest = background_position) 
         selection.moveSelection()
         updateMenus()
@@ -100,8 +128,9 @@ def updateCanvas():
 
 #RUN
 if __name__ == "__main__":
+    importSettingsMenu()
     importApps()
     importSideMenu()
-    selection = Selection()
+    selection = Selection(sideMenu, activeMenus)
     updateCanvas()
     pygame.quit()

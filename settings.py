@@ -2,6 +2,8 @@
 
 #Setting file
 import os
+NAME = "TVLauncher"
+
 
 # Project Root directory for relative paths
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -27,3 +29,4 @@ BUTTON_COLOR = (100, 100, 200)  # Blue-ish
 # Asset paths
 BACKGROUND_IMAGE = os.path.join(BASE_DIR, "Assets", "Images", "background2.jpg")
 TEST_BUTTON_IMAGE = os.path.join(BASE_DIR, "Assets", "Images", "testing.png")
+CLICK_SOUND = os.path.join(BASE_DIR, "Assets", "Sound", "click.wav")
