@@ -7,11 +7,11 @@ pygame.display.set_caption(NAME)
 clock = pygame.time.Clock()
 
 #Define Menus
-appsMenu = Menu(Canvas.get_width() * .19, 0, 1500, Canvas.get_height(),'appsMenu')
+defaultMenu = Menu(Canvas.get_width() * .19, 0, 1500, Canvas.get_height(),'defaultMenu')
 addAppsMenu = Menu(Canvas.get_width() * .19, 0, 1500, Canvas.get_height(),'addAppsMenu')
-settingsMenu = Menu(Canvas.get_width() * .19, 0, 1500, Canvas.get_height(),'settingsMenu')
 sideMenu = Menu(0, 0, 200, Canvas.get_height(),"sideMenu")
-activeMenus = [ sideMenu, appsMenu ]
+Menus =[]
+activeMenus = [ sideMenu, defaultMenu]
 
 def showAddAppsMenu():
     activeMenus[1] = addAppsMenu
@@ -31,8 +31,7 @@ def importSettingsMenu():
     settingsMenu.isList = True
     return sideMenu.buttons 
 
-def importSideMenu():
-    sideMenuList = ['Apps', 'Settings']
+def importSideMenu(sideMenuList):
     height = 20
     for button in sideMenuList:
         sideMenuButton = Button(sideMenu.surface.get_width() * .1, height,150,40, button)
@@ -44,11 +43,12 @@ def importSideMenu():
     return sideMenu.buttons 
 
 #maybe re-Write this to include other menus
-def importApps():
+def importApps(menuFromFile):
+    menuFromFile = Menu(Canvas.get_width() * .19, 0, 1500, Canvas.get_height(), menuFromFile)
     padding = 25
     button_width = 256
     button_height = 256
-    max_width = appsMenu.surface.get_width() - padding
+    max_width = menuFromFile.surface.get_width() - padding
     buttons_per_row = max_width // (button_width + padding)
     
     # Load JSON
@@ -59,14 +59,14 @@ def importApps():
             json.dump(default_data, f, indent=2)
     with open('./apps.json', 'r') as apps:
         data = json.load(apps)
-        apps_list = data['apps']
+        apps_list = data[menuFromFile.name]
     
     # Calculate grid dimensions
     total_buttons = len(apps_list)
     rows = (total_buttons + buttons_per_row - 1) // buttons_per_row  # Ceiling division
     
     # Create a 2D matrix
-    appsMenu.button_matrix = [[] for _ in range(rows)]
+    menuFromFile.button_matrix = [[] for _ in range(rows)]
     
     for i, app in enumerate(apps_list):
         row = i // buttons_per_row
@@ -81,20 +81,27 @@ def importApps():
             newButton.onclickFunction = showAddAppsMenu
         newButton.cmd = app['cmd']
         newButton.isImage = True
-        newButton.layer = appsMenu.surface
+        newButton.layer = menuFromFile.surface
         
-        appsMenu.button_matrix[row].append(newButton)
-        appsMenu.buttons.append(newButton)
-   
-    return appsMenu.buttons
+        menuFromFile.button_matrix[row].append(newButton)
+        menuFromFile.buttons.append(newButton)
+    Menus.append(menuFromFile) 
+    return menuFromFile.buttons
+
+def importMenusFromFile():
+    menusFromFile =[]
+    with open('./apps.json', 'r') as apps:
+        data = json.load(apps)
+    for menu in data:
+        importApps(menu)
+        menusFromFile.append(menu)
+        importSideMenu(menusFromFile)
+    
 
 def processSideMenuSelect():
     for button in sideMenu.buttons:
         if button.isSelected:
-            if button.buttonText == "Apps":
-                activeMenus[1] = appsMenu
-            if button.buttonText == "Settings":
-                activeMenus[1] = settingsMenu
+            activeMenus[1] = next(( menu for menu in Menus if menu.name == button.buttonText), None)
 
 def play_music():
     Music_Switch = not guiobjects.Music_Switch
@@ -128,9 +135,8 @@ def updateCanvas():
 
 #RUN
 if __name__ == "__main__":
-    importSettingsMenu()
-    importApps()
-    importSideMenu()
+    importMenusFromFile()
+    #importSettingsMenu()
     selection = Selection(sideMenu, activeMenus)
     updateCanvas()
     pygame.quit()
