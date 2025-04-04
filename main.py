@@ -1,5 +1,4 @@
 #!/usr/bin/python3
-import pygame 
 from ui import *
 import json
 #setup
@@ -38,12 +37,12 @@ def importApps(menuFromFile):
     buttons_per_row = max_width // (button_width + padding)
     
     # Load JSON
-    if not os.path.exists('./apps.json'):
+    if not os.path.exists(APPS_PATH):
         print("apps.json not found, creating a default file.")
         default_data = {"apps": [{"name": "defaultApp", "image": "./Assets/defaultApp.png", "cmd": "echo 'hello'"}]}
-        with open('./apps.json', 'w') as f:
+        with open(APPS_PATH, 'w') as f:
             json.dump(default_data, f, indent=2)
-    with open('./apps.json', 'r') as apps:
+    with open(APPS_PATH, 'r') as apps:
         data = json.load(apps)
         apps_list = data[menuFromFile.name]
     
