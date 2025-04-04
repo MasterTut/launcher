@@ -1,4 +1,4 @@
-import pygame
+import pygame 
 import subprocess
 import os
 import sys
@@ -112,7 +112,6 @@ class Selection:
     #define key mappings here
     def moveSelection(self):
         for event in pygame.event.get():
-            print(self.menuSelected.name)
             if event.type == pygame.QUIT:
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
@@ -207,8 +206,7 @@ class Selection:
         buttons_per_row = len(self.menuSelected.button_matrix[0])
         row = buttonIndex // buttons_per_row
         col = buttonIndex % buttons_per_row
-        if self.menuSelected.name == "sideMenu":
-            
+        if self.menuSelected.isList:
             if direction == 'RIGHT':
                 #Immedialty switch to DisplayedMenu if there are buttons  
                 if len(self.menus[1].buttons) == 0:
