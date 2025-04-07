@@ -17,7 +17,7 @@ WINDOW_SIZE = (resolutionWidth, resolutionHeight)
 FPS = 60
 
 #Font Settings 
-FONT_PATH = os.path.join(BASE_DIR, "Assets", "Fonts", "JetBrainsMonoNLNerdFontPropo-Regular.ttf")
+FONT_PATH = os.path.join(BASE_DIR, "Assets", "Fonts", "GoMonoNerdFont-Bold.ttf")
 FONT_SIZE = 30
 
 # Colors

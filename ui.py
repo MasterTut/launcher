@@ -22,7 +22,6 @@ background_img  = pygame.image.load(BACKGROUND_IMAGE).convert()
 background_img = pygame.transform.scale(background_img, (resolutionWidth, resolutionHeight))
 background_position = (0, 0)
 Font = pygame.font.Font(FONT_PATH, FONT_SIZE)
-
 #Adding Menus
 
 class Menu:

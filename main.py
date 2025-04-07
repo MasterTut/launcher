@@ -8,7 +8,7 @@ clock = pygame.time.Clock()
 #Define Default Menus
 defaultMenu = Menu(Canvas.get_width() * .19, 0, 1500, Canvas.get_height(),'defaultMenu')
 addAppsMenu = Menu(Canvas.get_width() * .19, 0, 1500, Canvas.get_height(),'addAppsMenu')
-sideMenu = Menu(0, 0, 200, Canvas.get_height(),"sideMenu")
+sideMenu = Menu(0, 0, 300, Canvas.get_height(),"sideMenu")
 Menus =[]
 activeMenus = [ sideMenu, defaultMenu]
 
@@ -20,7 +20,7 @@ def showAddAppsMenu():
 def importSideMenu(sideMenuList):
     height = 20
     for button in sideMenuList:
-        sideMenuButton = Button(sideMenu.surface.get_width() * .1, height,150,40, button)
+        sideMenuButton = Button(sideMenu.surface.get_width() * .2, height,150,40, button)
         sideMenuButton.layer = sideMenu.surface 
         sideMenu.buttons.append(sideMenuButton)
         height += 50
@@ -29,7 +29,7 @@ def importSideMenu(sideMenuList):
 
 #Creates app menus and buttons based file from root directory
 def importApps(menuFromFile):
-    menuFromFile = Menu(Canvas.get_width() * .19, 0, 1500, Canvas.get_height(), menuFromFile)
+    menuFromFile = Menu(Canvas.get_width() * .19, 0, 1450, Canvas.get_height(), menuFromFile)
     padding = 25
     button_width = 256
     button_height = 256
@@ -103,7 +103,7 @@ def play_music():
 def updateMenus():
     for menu in activeMenus:
         if menu.name != "sideMenu":
-            menu.surface.fill((0, 0, 0, 25))
+            menu.surface.fill((0, 0, 50, 50))
         menu.surface.set_alpha(255)
         for button in menu.buttons:
             button.display()
