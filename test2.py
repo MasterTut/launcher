@@ -1,5 +1,5 @@
 from text_input import *
-
+import json
 # Variables to store input
 # Main game loop
 
@@ -10,7 +10,7 @@ submitButton = Button(500, 300,150,40, "Submit")
 
 submitButton.layer = Canvas
 def importInputBox():
-    input_box_fields = ['name', 'img','cmd']
+    input_box_fields = ['Menu', 'name', 'image','cmd']
     x = 100
     for field in input_box_fields:
         input_box = TextInput(500, x, 600, 40, field)
@@ -18,7 +18,20 @@ def importInputBox():
         input_boxes.append(input_box)
 
 def submitButtonFunc():
-    dataFromTextInput = {input_boxes[0].text, input_boxes[0].name  }
+    dataFromTextInput = {'name': '', 'image': '', 'cmd': ''}
+    menuFromInput = input_boxes[0].text
+    for input in input_boxes[1:]:
+        print(input.name)
+        dataFromTextInput[input.name] = input.text
+    with open (APPS_PATH, 'r') as file:
+        dataFromFile = json.load(file)
+    if menuFromInput in dataFromFile:
+        dataFromFile[input_boxes[0].text].append(dataFromTextInput) 
+    else:
+        dataFromFile[input_boxes[0].text] = [dataFromTextInput]
+    with open (APPS_PATH, 'w') as file:
+        json.dump(dataFromFile, file, indent =4)
+
     print(dataFromTextInput)
 
 
@@ -81,7 +94,7 @@ while running:
     submitButton.display() 
     # Draw the input boxes
     for input in input_boxes:
-        input.display(Canvas)
+        input.display()
     
     # Update the display
     pygame.display.flip()
