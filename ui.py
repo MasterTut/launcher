@@ -44,10 +44,25 @@ class Menu:
             Canvas.blit(self.surface, (self.x, self.y))
     def toggleDisplay(self):
         self.hide = not self.hide
+    def showError(self, message, duration=2000):
+        #font = pygame.font.Font(None, 48)
+        #message = str(message) if message is not None else "Unknown error"
+        text_surface = Font.render(message, True, RED)
+        text_rect = text_surface.get_rect(center=(self.width//2, self.height//2))
+        
+        start_time = pygame.time.get_ticks()
+        while pygame.time.get_ticks() - start_time < duration:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    return False
+            Canvas.blit(text_surface, text_rect)
+            pygame.display.flip()
+        return True
+
 
 
 class Button:
-      def __init__(self, x, y, width, height, buttonText='Default'):
+      def __init__(self, x, y, width, height, surface, buttonText='Default'):
           self.x = x
           self.y = y
           self.width = width 
@@ -55,7 +70,7 @@ class Button:
           self.buttonText = buttonText
           self.isImage = False
           self.buttonImage = pygame.image.load(TEST_BUTTON_IMAGE)
-          self.layer = None # Will be set to menu.surface in importApps 
+          self.layer = surface # Will be set to menu.surface  
           self.cmd = "echo " + self.buttonText
           self.isSelected = False
           self.fillColors = { 'normal' : '#ffffff', 'hover' : '#666666',  'pressed' : '#333333', }
@@ -99,35 +114,36 @@ class Selection:
         self.y = self.buttonSelected.buttonRect.y 
         self.width = 25 
         self.height = 25 
-         
         # adding a selection surface is to get a visual of what it is selcting this should 
-        # able to comment out in production
         self.surface = pygame.Surface((self.width, self.height))
         self.selectionRect = pygame.Rect(self.x, self.y, self.width, self.height) 
         self.surface.fill((100, 100, 100))
-        self.isMoving = False
+        self.isEnabled = True
 
 
     #define key mappings here
     def moveSelection(self):
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                sys.exit()
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                pass
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
+        if self.isEnabled:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
                     sys.exit()
-                if event.key == pygame.K_RIGHT:
-                    self.moveRightLeft('RIGHT')
-                if event.key == pygame.K_LEFT:
-                    self.moveRightLeft('LEFT')
-                if event.key == pygame.K_UP:
-                    self.moveUpDown( 'UP')
-                if event.key == pygame.K_DOWN:
-                    self.moveUpDown( 'DOWN')
-                if event.key == pygame.K_RETURN:
-                        self.buttonSelected.onclickFunction()
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    pass
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        sys.exit()
+                    if event.key == pygame.K_RIGHT:
+                        self.moveRightLeft('RIGHT')
+                    if event.key == pygame.K_LEFT:
+                        self.moveRightLeft('LEFT')
+                    if event.key == pygame.K_UP:
+                        self.moveUpDown( 'UP')
+                    if event.key == pygame.K_DOWN:
+                        self.moveUpDown( 'DOWN')
+                    if event.key == pygame.K_RETURN:
+                            self.buttonSelected.onclickFunction()
+        else:
+            return
     def moveUpDown(self, direction):
         self.buttonSelected.isSelected = False
         if not self.menuSelected.buttons:

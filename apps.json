@@ -36,6 +36,53 @@
             "name": "funtogo2",
             "image": "./Assets/Images/addApp.png",
             "cmd": "echo 'fun'"
+        },
+        {
+            "name": "defaultApp",
+            "image": "./Assets/Images/defaultApp.png",
+            "cmd": "echo 'hello'"
+        },
+        {
+            "name": "fun",
+            "image": "./Assets/Images/defaultApp.png",
+            "cmd": "echo 'true'"
+        },
+        {
+            "name": "test",
+            "image": "./Assets/Images/defaultApp.png",
+            "cmd": "echo 'test'"
+        },
+        {
+            "name": "letsgo",
+            "image": "./Assets/Images/defaultApp.png",
+            "cmd": "echo 'lets gooooo'"
+        },
+        {
+            "name": "letsgo",
+            "image": "./Assets/Images/defaultApp.png",
+            "cmd": "echo 'lets gooooo'"
+        },
+        {
+            "name": "letsgo2",
+            "image": "./Assets/Images/defaultApp.png",
+            "cmd": "echo 'fartastic'"
+        },
+        {
+            "name": "fun",
+            "image": "./Assets/Images/defaultApp.png",
+            "cmd": "echo 'ok'"
+        },
+        {
+            "name": "something",
+            "image": "./Assets/Images/defaultApp.png",
+            "cmd": "echo 'test'"
         }
     ]
+
+
+
+
+
+
+
 }

@@ -3,8 +3,15 @@
 #Setting file
 import os
 NAME = "TVLauncher"
+#Colors 
 
-
+WHITE = (255, 255, 255)
+GRAY = (150, 150, 150)
+DARK_GRAY = (100, 100, 100)
+BLUE = (0, 150, 255)
+DARK_BLUE = (0, 100, 200)
+RED = (255, 0, 0)
+BLACK = (0,0,0)
 # Project Root directory for relative paths
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -21,8 +28,8 @@ FONT_PATH = os.path.join(BASE_DIR, "Assets", "Fonts", "GoMonoNerdFont-Bold.ttf")
 FONT_SIZE = 30
 
 # Colors
-BACKGROUND_COLOR = (255, 255, 255)  # White
-TEXT_COLOR = (0, 0, 0)  # Black
+BACKGROUND_COLOR = WHITE  # White
+TEXT_COLOR = BLACK  # Black
 BUTTON_COLOR = (100, 100, 200)  # Blue-ish
 
 

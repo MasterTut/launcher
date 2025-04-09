@@ -94,7 +94,7 @@ while running:
     submitButton.display() 
     # Draw the input boxes
     for input in input_boxes:
-        input.display(Canvas)
+        input.display()
     
     # Update the display
     pygame.display.flip()
