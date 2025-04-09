@@ -36,5 +36,6 @@ BUTTON_COLOR = (100, 100, 200)  # Blue-ish
 # Asset paths
 BACKGROUND_IMAGE = os.path.join(BASE_DIR, "Assets", "Images", "background2.jpg")
 TEST_BUTTON_IMAGE = os.path.join(BASE_DIR, "Assets", "Images", "testing.png")
-CLICK_SOUND = os.path.join(BASE_DIR, "Assets", "Sound", "click.wav")
+#CLICK_SOUND = os.path.join(BASE_DIR, "Assets", "Sound", "click.wav")
+CLICK_SOUND = os.path.join(BASE_DIR, "Assets", "Sound", "click.mp3")
 APPS_PATH = os.path.join(BASE_DIR, "apps.json")
