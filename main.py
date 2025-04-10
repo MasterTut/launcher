@@ -12,10 +12,11 @@ defaultMenu = Menu(Canvas.get_width() * .19, 0, 1500, Canvas.get_height(),'defau
 
 Menus =[]
 activeMenus = [ defaultMenu, defaultMenu]
-
+activeMenus.append(AddAppMenu(0, 0, 1500, Canvas.get_height()))
+activeMenus[2].hide = True
 
 def showAddAppsMenu():
-    activeMenus[1] = AddAppMenu(0, 0, 1500, Canvas.get_height()) 
+    activeMenus[2].hide = False 
 
 #The side menu(on right of screen) controls what is displayed on left of screen (apps Menu) 
 def importSideMenu(sideMenuList):
@@ -105,25 +106,22 @@ def updateMenus():
     for menu in activeMenus:
         if menu.name != "sideMenu":
             menu.surface.fill((0, 0, 50, 50))
-        if menu.name == "AddAppMenu":
-            if menu.hide:
-                selection.isEnabled = True
-                activeMenus[0] = importMenusFromFile()
-                selection.menuSelected = activeMenus[0]
-                print(activeMenus)
+        #if menu.name == "AddAppMenu" and menu.hide:
+        #    selection.isEnabled = True
+        #    activeMenus[0] = importMenusFromFile()
+        #    selection.menuSelected = activeMenus[0]
+        #    selection.buttonSelected = activeMenus[0].buttons[0]
 
-            else:
-                selection.isEnabled = False 
-                menu.navigateFields()
-                for input in menu.input_boxes:
-                    input.display()
-        
+        if menu.name == "AddAppMenu" and menu.hide == False:
+            selection.isEnabled = False
+            menu.navigateFields()
+            menu.displayFields() 
+                
+        print(selection.isEnabled)
         menu.surface.set_alpha(255)
         for button in menu.buttons:
             button.display()
         menu.display()
-
-
 
 #Creates the game loop to update the screen
 def updateCanvas():

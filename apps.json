@@ -23,66 +23,41 @@
     ],
     "Settings": [
         {
-            "name": "fun",
-            "image": "./Assets/Images/addApp.png",
-            "cmd": "echo 'fun'"
-        },
-        {
-            "name": "funtogo3",
-            "image": "./Assets/Images/addApp.png",
-            "cmd": "echo 'fun'"
-        },
-        {
-            "name": "funtogo2",
-            "image": "./Assets/Images/addApp.png",
-            "cmd": "echo 'fun'"
-        },
-        {
             "name": "defaultApp",
             "image": "./Assets/Images/defaultApp.png",
             "cmd": "echo 'hello'"
         },
         {
-            "name": "fun",
-            "image": "./Assets/Images/defaultApp.png",
-            "cmd": "echo 'true'"
+            "name": "test",
+            "image": "./Assets/Images/DefaultApp.png",
+            "cmd": "test"
         },
         {
             "name": "test",
             "image": "./Assets/Images/defaultApp.png",
-            "cmd": "echo 'test'"
+            "cmd": "test"
         },
         {
-            "name": "letsgo",
-            "image": "./Assets/Images/defaultApp.png",
-            "cmd": "echo 'lets gooooo'"
-        },
-        {
-            "name": "letsgo",
-            "image": "./Assets/Images/defaultApp.png",
-            "cmd": "echo 'lets gooooo'"
-        },
-        {
-            "name": "letsgo2",
-            "image": "./Assets/Images/defaultApp.png",
-            "cmd": "echo 'fartastic'"
-        },
-        {
-            "name": "fun",
-            "image": "./Assets/Images/defaultApp.png",
-            "cmd": "echo 'ok'"
-        },
-        {
-            "name": "something",
+            "name": "test2",
             "image": "./Assets/Images/defaultApp.png",
             "cmd": "echo 'test'"
+        },
+        {
+            "name": "test3",
+            "image": "./Assets/Images/defaultApp.png",
+            "cmd": "test3"
+        },
+        {
+            "name": "test4",
+            "image": "./Assets/Images/defaultApp.png",
+            "cmd": "test55"
+        }
+    ],
+    "Setttings": [
+        {
+            "name": "test",
+            "image": "./Assets/Images/DefaultApp.png",
+            "cmd": "test2"
         }
     ]
-
-
-
-
-
-
-
 }
