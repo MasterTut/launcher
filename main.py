@@ -12,11 +12,9 @@ defaultMenu = Menu(Canvas.get_width() * .19, 0, 1500, Canvas.get_height(),'defau
 
 Menus =[]
 activeMenus = [ defaultMenu, defaultMenu]
-activeMenus.append(AddAppMenu(0, 0, 1500, Canvas.get_height()))
-activeMenus[2].hide = True
 
 def showAddAppsMenu():
-    activeMenus[2].hide = False 
+    activeMenus.append(AddAppMenu(Canvas.get_width() *.21, 0, 1500, Canvas.get_height()))
 
 #The side menu(on right of screen) controls what is displayed on left of screen (apps Menu) 
 def importSideMenu(sideMenuList):
@@ -105,19 +103,21 @@ def play_music():
 def updateMenus():
     for menu in activeMenus:
         if menu.name != "sideMenu":
-            menu.surface.fill((0, 0, 50, 50))
-        #if menu.name == "AddAppMenu" and menu.hide:
-        #    selection.isEnabled = True
-        #    activeMenus[0] = importMenusFromFile()
-        #    selection.menuSelected = activeMenus[0]
-        #    selection.buttonSelected = activeMenus[0].buttons[0]
+            menu.surface.fill((0, 0, 50))
+        if menu.name == "AddAppMenu" and menu.hide:
+            activeMenus.remove('AddAppMenu')
+            selection.isEnabled = True
+            activeMenus[0] = importMenusFromFile()
+            selection.menuSelected = activeMenus[0]
+            selection.buttonSelected = activeMenus[0].buttons[0]
 
-        if menu.name == "AddAppMenu" and menu.hide == False:
+        elif menu.name == "AddAppMenu" and menu.hide == False:
+            menu.surface.fill((100,100,100))
             selection.isEnabled = False
             menu.navigateFields()
             menu.displayFields() 
                 
-        print(selection.isEnabled)
+        print(menu.name)
         menu.surface.set_alpha(255)
         for button in menu.buttons:
             button.display()
