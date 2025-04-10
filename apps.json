@@ -51,6 +51,31 @@
             "name": "test4",
             "image": "./Assets/Images/defaultApp.png",
             "cmd": "test55"
+        },
+        {
+            "name": "something",
+            "image": "./Assets/Images/defaultApp.png",
+            "cmd": "echo 'test"
+        },
+        {
+            "name": "test",
+            "image": "./Assets/Images/defaultApp.png",
+            "cmd": "test"
+        },
+        {
+            "name": "blah",
+            "image": "./Assets/Images/defaultApp.png",
+            "cmd": "k"
+        },
+        {
+            "name": "test",
+            "image": "./Assets/Images/defaultApp.png",
+            "cmd": "k"
+        },
+        {
+            "name": "test",
+            "image": "./Assets/Images/defaultApp.png",
+            "cmd": "test"
         }
     ],
     "Setttings": [
