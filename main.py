@@ -8,13 +8,18 @@ clock = pygame.time.Clock()
 
 #Define Default Menu
 defaultMenu = Menu(Canvas.get_width() * .19, 0, 1500, Canvas.get_height(),'defaultMenu')
+addAppMenu = AddAppMenu(Canvas.get_width() *.21, 0, 1500, Canvas.get_height())
 #addAppsMenu = AddAppMenu(0, 0, 1500, Canvas.get_height(),'addAppsMenu')
 
 Menus =[]
-activeMenus = [ defaultMenu, defaultMenu]
+activeMenus = [ defaultMenu, defaultMenu, addAppMenu]
 
 def showAddAppsMenu():
-    activeMenus.append(AddAppMenu(Canvas.get_width() *.21, 0, 1500, Canvas.get_height()))
+    menu = activeMenus[2]
+    menu.hide = False
+    selection.menuSelected = menu
+
+
 
 #The side menu(on right of screen) controls what is displayed on left of screen (apps Menu) 
 def importSideMenu(sideMenuList):
@@ -102,25 +107,15 @@ def play_music():
 #Displays Menus and the buttons on those menus
 def updateMenus():
     for menu in activeMenus:
-        if menu.name != "sideMenu":
-            menu.surface.fill((0, 0, 50))
-        if menu.name == "AddAppMenu" and menu.hide:
-            activeMenus.remove('AddAppMenu')
-            selection.isEnabled = True
-            activeMenus[0] = importMenusFromFile()
-            selection.menuSelected = activeMenus[0]
-            selection.buttonSelected = activeMenus[0].buttons[0]
-
-        elif menu.name == "AddAppMenu" and menu.hide == False:
+        menu.surface.fill((0, 0, 50, 25))
+        if menu.name == "addAppMenu" and menu.isSelected:
+            menu.hide = False
             menu.surface.fill((100,100,100))
-            selection.isEnabled = False
-            menu.navigateFields()
-            menu.displayFields() 
-                
-        print(menu.name)
+        elif menu.name == "addAppMenu" and not menu.isSelected:
+            menu.hide = True
+
+        
         menu.surface.set_alpha(255)
-        for button in menu.buttons:
-            button.display()
         menu.display()
 
 #Creates the game loop to update the screen
@@ -136,6 +131,6 @@ def updateCanvas():
 #Initalize and run
 if __name__ == "__main__":
     activeMenus[0] = importMenusFromFile() 
-    selection = Selection(activeMenus[0], activeMenus)
+    selection = Selection(activeMenus)
     updateCanvas()
     pygame.quit()
