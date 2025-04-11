@@ -38,12 +38,14 @@ class TextInput:
         self.menu.blit(self.textSurface, (self.textX, self.textY))
 
 class AddAppMenu(Menu):
-    def __init__(self,x, y,width,height, name='AddAppMenu'):
+    def __init__(self,x, y,width,height, name='addAppMenu'):
         super().__init__(x, y, width, height, name)
         self.input_box_fields = ['Menu', 'name', 'image','cmd']
         self.input_boxes = [TextInput(500, 100 + i * 50, 600, 40,self.surface, field) 
             for i, field in enumerate(self.input_box_fields)]
         self.buttons.append(Button(1000,300,150,40,self.surface, "Submit"))
+        self.isList = True
+        self.hide = True
     def displayFields(self):
         for input in self.input_boxes:
             input.display()
@@ -65,51 +67,4 @@ class AddAppMenu(Menu):
             print('Write Complete')
         else:
             self.showError(message="Path Does not exit")
-        
-
-    def navigateFields(self):
-        if self.hide == False:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    running = False
-                elif event.type == pygame.TEXTINPUT:
-                    for input in self.input_boxes:
-                        if input.isActive:
-                            input.text += event.text
-                            input.update_text()
-                
-                elif event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_ESCAPE:
-                        pygame.quit()
-                        sys.exit()
-                    if event.key == pygame.K_TAB:
-                         # Switch active input box
-                        for i, box in enumerate(self.input_boxes):
-                            if box.isActive:
-                                box.isActive = False
-                                next_box = self.input_boxes[(i + 1) % len(self.input_boxes)]
-                                next_box.isActive = True
-                                print(f"Switched to {next_box.name}, isActive: {next_box.isActive}")
-                                break
-                        # Activate the first box if none were active
-                        if not any(box.isActive for box in self.input_boxes):
-                            self.input_boxes[0].isActive = True 
-                                                                                                     
-                    elif event.key == pygame.K_BACKSPACE:
-                        for input in self.input_boxes:
-                            if input.isActive:
-                                input.text =  input.text[:-1]
-                                input.update_text()
-                                                                                                     
-                elif event.type == pygame.MOUSEBUTTONDOWN:
-                    mouse_pos = pygame.mouse.get_pos()
-                    if self.buttons[0].buttonRect.collidepoint(mouse_pos):
-                        self.submitButtonFunc()
-                    for input in self.input_boxes:
-                        input.isActive = False
-                        if input.rect.collidepoint(mouse_pos):
-                            input.isActive = True
-                        else:
-                            input.isActive = False
-        else:
-            return
+ 

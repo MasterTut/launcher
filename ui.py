@@ -38,9 +38,22 @@ class Menu:
         self.is_form = False
         self.hide = False
         self.isList = False
-    
+        self.bg_color = (200,200,200,255)
+        self.radius = 20
+        self.input_boxes = []
+        self.isSelected = False 
+        pygame.draw.rect(self.surface, self.bg_color, (0, 0, self.width, self.height), border_radius=self.radius)
+
+    def displayButtons(self):
+        for button in self.buttons:
+            button.display()
+    def displayFields(self):
+        for input in self.input_boxes:
+            input.display()
     def display(self):
         if self.hide == False:
+            self.displayButtons()
+            self.displayFields()
             Canvas.blit(self.surface, (self.x, self.y))
     def toggleDisplay(self):
         self.hide = not self.hide
@@ -63,6 +76,7 @@ class Menu:
 
 class Button:
       def __init__(self, x, y, width, height, surface, buttonText='Default'):
+          self.name = buttonText
           self.x = x
           self.y = y
           self.width = width 
@@ -80,6 +94,8 @@ class Button:
           self.font_rendered = self.font.render(self.buttonText, True, (255,200,200))
           self.font_rendered_highlighted = self.font.render(self.buttonText, True, (255, 255, 200))
           self.highlighted = False
+      
+      
       def onclickFunction(self):
           subprocess.call(self.cmd, shell=True)
       def displayText(self):
@@ -102,13 +118,14 @@ class Button:
            self.displayImage()
         else:
            self.displayText()
+    
 
             
 class Selection:
-    def __init__(self, menuSelected, menus) -> None:
+    def __init__(self,  menus) -> None:
         self.sound = Mixer.Sound(CLICK_SOUND)
         self.menus = menus 
-        self.menuSelected = menuSelected 
+        self.menuSelected = menus[0] 
         self.buttonSelected = self.menuSelected.buttons[0] 
         self.x = self.buttonSelected.buttonRect.x  
         self.y = self.buttonSelected.buttonRect.y 
@@ -119,17 +136,56 @@ class Selection:
         self.selectionRect = pygame.Rect(self.x, self.y, self.width, self.height) 
         self.surface.fill((100, 100, 100))
         self.isEnabled = True
+    def deselectAllMenus(self):
+        for menu in self.menus:
+            if menu != self.menuSelected:
+                menu.isSelected = False
 
-
+    def selectInputBox(self, direction):
+        input_boxes = self.menuSelected.input_boxes
+        if not input_boxes:
+            return
+        for i, box in enumerate(self.menuSelected.input_boxes):
+            if box.isActive:
+               box.isActive = False
+               if direction == "UP":
+                    next_box = input_boxes[(i -1) % len(input_boxes)]
+               else:
+                    next_box = self.menuSelected.input_boxes[(i + 1) % len(self.menuSelected.input_boxes)]
+               next_box.isActive = True
+               print(f"Switched to {next_box.name}, isActive: {next_box.isActive}")
+               break
+            # Activate the first box if none were active
+            if not any(box.isActive for box in self.menuSelected.input_boxes):
+                self.menuSelected.input_boxes[0].isActive = True 
     #define key mappings here
     def moveSelection(self):
+        self.deselectAllMenus()
+        self.menuSelected.isSelected = True
         if self.isEnabled:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     sys.exit()
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    pass
-                if event.type == pygame.KEYDOWN:
+                    #Mouse Fuction for selecting text fields on AddAppMenu
+                    if self.menuSelected.name == "AddAppMenu":
+                        mouse_pos = pygame.mouse.get_pos()
+                        if self.menuSelected.buttons[0].buttonRect.collidepoint(mouse_pos):
+                            self.menuSelected.submitButtonFunc()
+                        for input in self.menuSelected.input_boxes:
+                            input.isActive = False
+                            if input.rect.collidepoint(mouse_pos):
+                                input.isActive = True
+                            else:
+                                input.isActive = False
+
+                elif event.type == pygame.TEXTINPUT:
+                    for input in self.menuSelected.input_boxes:
+                        if input.isActive:
+                            input.text += event.text
+                            input.update_text()
+                
+                elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
                         sys.exit()
                     if event.key == pygame.K_RIGHT:
@@ -141,11 +197,24 @@ class Selection:
                     if event.key == pygame.K_DOWN:
                         self.moveUpDown( 'DOWN')
                     if event.key == pygame.K_RETURN:
-                            self.buttonSelected.onclickFunction()
+                        self.buttonSelected.onclickFunction()
+                    if event.key == pygame.K_TAB and len(self.menuSelected.input_boxes) > 0:
+                        self.selectInputBox("DOWN")
+                    elif event.key == pygame.K_BACKSPACE and len(self.menuSelected.input_boxes) > 0:
+                        for input in self.menuSelected.input_boxes:
+                            if input.isActive:
+                                input.text = input.text[:-1]
+                                input.update_text()
+
         else:
             return
     def moveUpDown(self, direction):
+        #handle input boxes 
         self.buttonSelected.isSelected = False
+        if len(self.menuSelected.input_boxes) > 0:
+            self.selectInputBox(direction)
+            return
+        
         if not self.menuSelected.buttons:
             print("No Buttons in menu!")
             return
@@ -217,21 +286,23 @@ class Selection:
             return
         self.sound.play()
         
+        if self.menuSelected.isList:
+           if direction == 'RIGHT':
+                #Immedialty switch to DisplayedMenu if there are buttons  
+                if len(self.menuSelected.buttons) == 0:
+                    return 
+                else:
+                    self.menuSelected = self.menus[1]
+           elif direction == 'LEFT':
+                self.menuSelected.isSelected = False 
+                self.menuSelected = self.menus[0]
+           self.buttonSelected = self.menuSelected.buttons[0]
+ 
         buttonIndex = self.menuSelected.buttons.index(self.buttonSelected)
         buttons_per_row = len(self.menuSelected.button_matrix[0])
         row = buttonIndex // buttons_per_row
         col = buttonIndex % buttons_per_row
-        if self.menuSelected.isList:
-            if direction == 'RIGHT':
-                #Immedialty switch to DisplayedMenu if there are buttons  
-                if len(self.menus[1].buttons) == 0:
-                    return 
-                else:
-                    self.menuSelected = self.menus[1]
-                    self.buttonSelected = self.menuSelected.buttons[0]
-            elif direction == 'LEFT':
-                pass
- 
+        
         if direction == 'RIGHT' and col + 1 < len(self.menuSelected.button_matrix[row]):
             col += 1
             self.buttonSelected = self.menuSelected.button_matrix[row][col]
