@@ -2,7 +2,7 @@
     "apps": [
         {
             "name": "AddApp",
-            "image": "./Assets/Images/addApp.png",
+            "image": "./Assets/Images/netflix-logo-icon.svg",
             "cmd": "librewolf"
         },
         {

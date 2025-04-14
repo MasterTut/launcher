@@ -7,23 +7,23 @@ pygame.display.set_caption(NAME)
 clock = pygame.time.Clock()
 
 #Define Default Menu
-defaultMenu = Menu(Canvas.get_width() * .19, 0, 1500, Canvas.get_height(),'defaultMenu')
-addAppMenu = AddAppMenu(Canvas.get_width() *.21, 0, 1500, Canvas.get_height())
-#addAppsMenu = AddAppMenu(0, 0, 1500, Canvas.get_height(),'addAppsMenu')
+defaultMenu = Menu(Canvas.get_width() * .19, 0, Canvas.get_width(), Canvas.get_height(),'defaultMenu')
+addAppMenu = AddAppMenu(Canvas.get_width() *.19, 0, Canvas.get_width(), Canvas.get_height()).menu
 
 Menus =[]
 activeMenus = [ defaultMenu, defaultMenu, addAppMenu]
 
+#activeMenus = []
 def showAddAppsMenu():
     menu = activeMenus[2]
     menu.hide = False
     selection.menuSelected = menu
 
 
-
+#need to clean up the imports and move them into objects SideMenu
 #The side menu(on right of screen) controls what is displayed on left of screen (apps Menu) 
 def importSideMenu(sideMenuList):
-    sideMenu = Menu(0, 0, 300, Canvas.get_height(),"sideMenu")
+    sideMenu = Menu(0, 20, 300, Canvas.get_height() -40,"sideMenu")
     height = 20
     for button in sideMenuList:
         sideMenuButton = Button(sideMenu.surface.get_width() * .2, height,150,40,sideMenu.surface, button)
@@ -35,14 +35,14 @@ def importSideMenu(sideMenuList):
 
 #Creates app menus and buttons based file from root directory
 def importApps(menuFromFile):
-    menuFromFile = Menu(Canvas.get_width() * .19, 0, 1450, Canvas.get_height(), menuFromFile)
+    menuFromFile = Menu(Canvas.get_width() * .19, 20, Canvas.get_width(), Canvas.get_height() -40, menuFromFile)
     padding = 25
     button_width = 256
     button_height = 256
     max_width = menuFromFile.surface.get_width() - padding
     buttons_per_row = max_width // (button_width + padding)
     
-    # Load JSON
+    # Checks if path exists for apps.json, and creates the default one. Otherwise appends it. 
     if not os.path.exists(APPS_PATH):
         print("apps.json not found, creating a default file.")
         default_data = {"apps": [{"name": "defaultApp", "image": "./Assets/defaultApp.png", "cmd": "echo 'hello'"}]}
@@ -70,7 +70,6 @@ def importApps(menuFromFile):
             newButton.onclickFunction = showAddAppsMenu
         newButton.cmd = app['cmd']
         newButton.isImage = True
-        #newButton.layer = menuFromFile.surface
         menuFromFile.button_matrix[row].append(newButton)
         menuFromFile.buttons.append(newButton)
     Menus.append(menuFromFile) 
@@ -84,9 +83,10 @@ def importMenusFromFile():
     for menu in data:
         importApps(menu)
         menusFromFile.append(menu)
+    #takes list of strings from file 
     return importSideMenu(menusFromFile)
     
-#Displays the App Menu on the right of screen when the sideMenu button is highlighted
+#Displays the App Menu on the right of screen when the sideMenu button is highlighted. Want to remove the need for Menus instead rely on activeMenus
 def processSideMenuSelect():
     for button in activeMenus[0].buttons:
         if button.isSelected:
@@ -107,14 +107,10 @@ def play_music():
 #Displays Menus and the buttons on those menus
 def updateMenus():
     for menu in activeMenus:
-        menu.surface.fill((0, 0, 50, 25))
         if menu.name == "addAppMenu" and menu.isSelected:
             menu.hide = False
-            menu.surface.fill((100,100,100))
         elif menu.name == "addAppMenu" and not menu.isSelected:
             menu.hide = True
-
-        
         menu.surface.set_alpha(255)
         menu.display()
 
@@ -130,7 +126,9 @@ def updateCanvas():
 
 #Initalize and run
 if __name__ == "__main__":
-    activeMenus[0] = importMenusFromFile() 
+    activeMenus[0] = importMenusFromFile() #First Menu in activeMenus is SideMenu 
+    for menu in Menus:
+        print(menu.name)
     selection = Selection(activeMenus)
     updateCanvas()
     pygame.quit()
