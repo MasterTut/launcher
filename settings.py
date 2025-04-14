@@ -9,7 +9,7 @@ WHITE = (255, 255, 255)
 GRAY = (150, 150, 150)
 DARK_GRAY = (100, 100, 100)
 BLUE = (0, 150, 255)
-DARK_BLUE = (0, 100, 200)
+DARK_BLUE = (10, 10, 74)
 RED = (255, 0, 0)
 BLACK = (0,0,0)
 # Project Root directory for relative paths

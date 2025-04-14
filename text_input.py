@@ -81,7 +81,10 @@ class SideMenu:
     def __init__(self,x, y,width,height, name='sideMenu'):
         self.menu = Menu(x, y, width, height, name)
         self.sideMenuList = []
-        self.isList = True
+        self.isList = self.menu.isList 
+        self.buttons = self.menu.buttons
+        self.button_matrix = self.menu.button_matrix
+        self.sideMenus = [] 
 
     
     def importSideMenu(self):
@@ -126,14 +129,12 @@ class SideMenu:
             newButton = Button(x, y, button_width, button_height,menuFromFile.surface, app['name'])
             newButton.buttonImage = pygame.image.load(app['image'])
             newButton.buttonImage = pygame.transform.scale(newButton.buttonImage, (button_width, button_height))
-            if newButton.buttonText == "defaultApp":
-                newButton.onclickFunction = showAddAppsMenu
             newButton.cmd = app['cmd']
             newButton.isImage = True
             #newButton.layer = menuFromFile.surface
             menuFromFile.button_matrix[row].append(newButton)
             menuFromFile.buttons.append(newButton)
-        Menus.append(menuFromFile) 
+        self.sideMenus.append(menuFromFile) 
         return menuFromFile.buttons
 
     def importMenusFromFile(self):
@@ -141,12 +142,12 @@ class SideMenu:
         with open('./apps.json', 'r') as apps:
             data = json.load(apps)
         for menu in data:
-            importApps(menu)
+            self.importApps(menu)
             self.sideMenuList.append(menu)
         #takes list of strings from file 
         self.importSideMenu()
 
-    def processSideMenuSelect(self):
+    def processSideMenuSelect(self, activeMenus):
         for button in activeMenus[0].buttons:
             if button.isSelected:
-                activeMenus[1] = next(( menu for menu in Menus if menu.name == button.buttonText), None)
+                activeMenus[1] = next(( menu for menu in self.sideMenus if menu.name == button.buttonText), None)

@@ -95,7 +95,7 @@ class Button:
           self.font_rendered = self.font.render(self.buttonText, True, (255,200,200))
           self.font_rendered_highlighted = self.font.render(self.buttonText, True, (255, 255, 200))
           self.highlighted = False
-      
+          self.bg_color = (DARK_BLUE) 
       
       def onclickFunction(self):
           subprocess.call(self.cmd, shell=True)
@@ -107,8 +107,15 @@ class Button:
         else:
           self.layer.blit(self.font_rendered, self.buttonRect)
       def displayImage(self):
+        padding = 5
         self.buttonSurface.fill((0,0,0,0))
-        self.layer.blit(self.buttonSurface, (0, 0))
+        #draw background for button
+        pygame.draw.rect(self.layer, (self.bg_color), 
+                         (self.buttonRect.x - padding, 
+                          self.buttonRect.y - padding, 
+                          self.buttonImage.get_width() + 2 * padding, 
+                          self.buttonImage.get_height() + 2 * padding))
+        #self.layer.blit(self.buttonSurface, (0, 0))
         if self.isSelected:
             image = pygame.transform.smoothscale(self.buttonImage, (300,300))
             self.layer.blit(image, (self.buttonRect.x -25, self.buttonRect.y -25))
@@ -116,6 +123,7 @@ class Button:
            self.layer.blit(self.buttonImage, self.buttonRect)
       def display(self):
         if self.isImage:
+           
            self.displayImage()
         else:
            self.displayText()
