@@ -37,18 +37,20 @@ class TextInput:
         self.menu.blit(self.nameSurface, (self.nameX, self.nameY))
         self.menu.blit(self.textSurface, (self.textX, self.textY))
 
-class AddAppMenu(Menu):
+class AddAppMenu:
     def __init__(self,x, y,width,height, name='addAppMenu'):
-        super().__init__(x, y, width, height, name)
+        self.menu = Menu(x, y, width, height, name)
+        self.name = self.menu.name
+        self.surface = self.menu.surface
         self.input_box_fields = ['Menu', 'name', 'image','cmd']
-        self.input_boxes = [TextInput(500, 100 + i * 50, 600, 40,self.surface, field) 
+        self.menu.input_boxes = [TextInput(500, 100 + i * 50, 600, 40,self.menu.surface, field) 
             for i, field in enumerate(self.input_box_fields)]
-        self.buttons.append(Button(1000,300,150,40,self.surface, "Submit"))
-        self.isList = True
-        self.hide = True
-    def displayFields(self):
-        for input in self.input_boxes:
-            input.display()
+        self.input_boxes = self.menu.input_boxes
+        self.menu.buttons.append(Button(1000,300,150,40,self.menu.surface, "Submit"))
+        self.menu.isList = True
+        self.menu.hide = True
+        self.menu.isSelected = False
+    
     def submitButtonFunc(self):
         dataFromTextInput = {'name': '', 'image': '', 'cmd': ''}
         self.menuFromInput = self.input_boxes[0].text
@@ -67,4 +69,84 @@ class AddAppMenu(Menu):
             print('Write Complete')
         else:
             self.showError(message="Path Does not exit")
- 
+    def display(self):
+            self.menu.display()
+    def toggleDisplay(self):
+            self.menu.toggleDisplay()
+    def showError(self, message, duration=2000):
+            return self.menu.showError(message, duration)
+           
+#Testing 
+class SideMenu:
+    def __init__(self,x, y,width,height, name='sideMenu'):
+        self.menu = Menu(x, y, width, height, name)
+        self.sideMenuList = []
+        self.isList = True
+
+    
+    def importSideMenu(self):
+        sideMenu = Menu(0, 20, 300, Canvas.get_height() -40,"sideMenu")
+        height = 20
+        for button in self.sideMenuList:
+            sideMenuButton = Button(sideMenu.surface.get_width() * .2, height,150,40,sideMenu.surface, button)
+            self.buttons.append(sideMenuButton)
+            height += 50
+        self.button_matrix[0] = sideMenu.buttons
+        #return sideMenu
+
+    def importApps(self, menuFromFile):
+        menuFromFile = Menu(Canvas.get_width() * .19, 20, Canvas.get_width(), Canvas.get_height() -40, menuFromFile)
+        padding = 25
+        button_width = 256
+        button_height = 256
+        max_width = menuFromFile.surface.get_width() - padding
+        buttons_per_row = max_width // (button_width + padding)
+        
+        # Load JSON
+        if not os.path.exists(APPS_PATH):
+            print("apps.json not found, creating a default file.")
+            default_data = {"apps": [{"name": "defaultApp", "image": "./Assets/defaultApp.png", "cmd": "echo 'hello'"}]}
+            with open(APPS_PATH, 'w') as f:
+                json.dump(default_data, f, indent=2)
+        with open(APPS_PATH, 'r') as apps:
+            data = json.load(apps)
+            apps_list = data[menuFromFile.name]
+        
+        # Calculate grid dimensions
+        total_buttons = len(apps_list)
+        rows = (total_buttons + buttons_per_row - 1) // buttons_per_row  # Ceiling division
+        
+        # Create a 2D matrix
+        menuFromFile.button_matrix = [[] for _ in range(rows)]
+        for i, app in enumerate(apps_list):
+            row = i // buttons_per_row
+            col = i % buttons_per_row
+            x = padding + col * (button_width + padding)
+            y = padding + row * (button_height + padding)
+            newButton = Button(x, y, button_width, button_height,menuFromFile.surface, app['name'])
+            newButton.buttonImage = pygame.image.load(app['image'])
+            newButton.buttonImage = pygame.transform.scale(newButton.buttonImage, (button_width, button_height))
+            if newButton.buttonText == "defaultApp":
+                newButton.onclickFunction = showAddAppsMenu
+            newButton.cmd = app['cmd']
+            newButton.isImage = True
+            #newButton.layer = menuFromFile.surface
+            menuFromFile.button_matrix[row].append(newButton)
+            menuFromFile.buttons.append(newButton)
+        Menus.append(menuFromFile) 
+        return menuFromFile.buttons
+
+    def importMenusFromFile(self):
+        #menusFromFile =[]
+        with open('./apps.json', 'r') as apps:
+            data = json.load(apps)
+        for menu in data:
+            importApps(menu)
+            self.sideMenuList.append(menu)
+        #takes list of strings from file 
+        self.importSideMenu()
+
+    def processSideMenuSelect(self):
+        for button in activeMenus[0].buttons:
+            if button.isSelected:
+                activeMenus[1] = next(( menu for menu in Menus if menu.name == button.buttonText), None)

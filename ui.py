@@ -38,11 +38,11 @@ class Menu:
         self.is_form = False
         self.hide = False
         self.isList = False
-        self.bg_color = (200,200,200,255)
+        self.bg_color = (0,0,25,100)
         self.radius = 20
         self.input_boxes = []
         self.isSelected = False 
-        pygame.draw.rect(self.surface, self.bg_color, (0, 0, self.width, self.height), border_radius=self.radius)
+        
 
     def displayButtons(self):
         for button in self.buttons:
@@ -52,6 +52,7 @@ class Menu:
             input.display()
     def display(self):
         if self.hide == False:
+            pygame.draw.rect(self.surface, self.bg_color, (0, 0, self.width, self.height), border_radius=self.radius)
             self.displayButtons()
             self.displayFields()
             Canvas.blit(self.surface, (self.x, self.y))
@@ -160,9 +161,9 @@ class Selection:
                 self.menuSelected.input_boxes[0].isActive = True 
     #define key mappings here
     def moveSelection(self):
-        self.deselectAllMenus()
-        self.menuSelected.isSelected = True
         if self.isEnabled:
+            self.deselectAllMenus()
+            self.menuSelected.isSelected = True
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     sys.exit()
@@ -233,6 +234,7 @@ class Selection:
                     buttonIndex += 1  # Move down in the list
                 else:
                     buttonIndex = 0  # Wrap to the top
+            #menus[1] = next(( menu for menu in Menus if menu.name == button.buttonText), None)
 
             self.buttonSelected = self.menuSelected.buttons[buttonIndex]
             self.selectionRect.x = self.buttonSelected.buttonRect.x + self.menuSelected.x
