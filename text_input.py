@@ -81,20 +81,17 @@ class SideMenu:
     def __init__(self,x, y,width,height, name='sideMenu'):
         self.menu = Menu(x, y, width, height, name)
         self.sideMenuList = []
-        self.isList = self.menu.isList 
-        self.buttons = self.menu.buttons
-        self.button_matrix = self.menu.button_matrix
         self.sideMenus = [] 
-
+        self.buttons = self.menu.buttons
+        self.menu.isList = True
     
     def importSideMenu(self):
-        sideMenu = Menu(0, 20, 300, Canvas.get_height() -40,"sideMenu")
         height = 20
         for button in self.sideMenuList:
-            sideMenuButton = Button(sideMenu.surface.get_width() * .2, height,150,40,sideMenu.surface, button)
-            self.buttons.append(sideMenuButton)
+            sideMenuButton = Button(self.menu.surface.get_width() * .2, height,150,40,self.menu.surface, button)
+            self.menu.buttons.append(sideMenuButton)
             height += 50
-        self.button_matrix[0] = sideMenu.buttons
+        self.menu.button_matrix[0] = self.menu.buttons
         #return sideMenu
 
     def importApps(self, menuFromFile):
@@ -131,7 +128,6 @@ class SideMenu:
             newButton.buttonImage = pygame.transform.scale(newButton.buttonImage, (button_width, button_height))
             newButton.cmd = app['cmd']
             newButton.isImage = True
-            #newButton.layer = menuFromFile.surface
             menuFromFile.button_matrix[row].append(newButton)
             menuFromFile.buttons.append(newButton)
         self.sideMenus.append(menuFromFile) 
@@ -147,7 +143,8 @@ class SideMenu:
         #takes list of strings from file 
         self.importSideMenu()
 
-    def processSideMenuSelect(self, activeMenus):
-        for button in activeMenus[0].buttons:
-            if button.isSelected:
-                activeMenus[1] = next(( menu for menu in self.sideMenus if menu.name == button.buttonText), None)
+    
+    
+    
+    
+    

@@ -6,95 +6,15 @@ import json
 pygame.display.set_caption(NAME)
 clock = pygame.time.Clock()
 
-#Define Default Menu
-defaultMenu = Menu(Canvas.get_width() * .19, 0, Canvas.get_width(), Canvas.get_height(),'defaultMenu')
-addAppMenu = AddAppMenu(Canvas.get_width() *.19, 0, Canvas.get_width(), Canvas.get_height()).menu
-
-Menus =[]
-activeMenus = [ defaultMenu, defaultMenu, addAppMenu]
-
-#activeMenus = []
 def showAddAppsMenu():
     menu = activeMenus[2]
     menu.hide = False
     selection.menuSelected = menu
 
 
-#need to clean up the imports and move them into objects SideMenu
-#The side menu(on right of screen) controls what is displayed on left of screen (apps Menu) 
-def importSideMenu(sideMenuList):
-    sideMenu = Menu(0, 20, 300, Canvas.get_height() -40,"sideMenu")
-    height = 20
-    for button in sideMenuList:
-        sideMenuButton = Button(sideMenu.surface.get_width() * .2, height,150,40,sideMenu.surface, button)
-        sideMenu.buttons.append(sideMenuButton)
-        height += 50
-    sideMenu.button_matrix[0] = sideMenu.buttons
-    sideMenu.isList = True
-    return sideMenu
-
-#Creates app menus and buttons based file from root directory
-def importApps(menuFromFile):
-    menuFromFile = Menu(Canvas.get_width() * .19, 20, Canvas.get_width(), Canvas.get_height() -40, menuFromFile)
-    padding = 25
-    button_width = 256
-    button_height = 256
-    max_width = menuFromFile.surface.get_width() - padding
-    buttons_per_row = max_width // (button_width + padding)
-    
-    # Checks if path exists for apps.json, and creates the default one. Otherwise appends it. 
-    if not os.path.exists(APPS_PATH):
-        print("apps.json not found, creating a default file.")
-        default_data = {"apps": [{"name": "defaultApp", "image": "./Assets/defaultApp.png", "cmd": "echo 'hello'"}]}
-        with open(APPS_PATH, 'w') as f:
-            json.dump(default_data, f, indent=2)
-    with open(APPS_PATH, 'r') as apps:
-        data = json.load(apps)
-        apps_list = data[menuFromFile.name]
-    
-    # Calculate grid dimensions
-    total_buttons = len(apps_list)
-    rows = (total_buttons + buttons_per_row - 1) // buttons_per_row  # Ceiling division
-    
-    # Create a 2D matrix
-    menuFromFile.button_matrix = [[] for _ in range(rows)]
-    for i, app in enumerate(apps_list):
-        row = i // buttons_per_row
-        col = i % buttons_per_row
-        x = padding + col * (button_width + padding)
-        y = padding + row * (button_height + padding)
-        newButton = Button(x, y, button_width, button_height,menuFromFile.surface, app['name'])
-        newButton.buttonImage = pygame.image.load(app['image'])
-        newButton.buttonImage = pygame.transform.scale(newButton.buttonImage, (button_width, button_height))
-        if newButton.buttonText == "defaultApp":
-            newButton.onclickFunction = showAddAppsMenu
-        newButton.cmd = app['cmd']
-        newButton.isImage = True
-        menuFromFile.button_matrix[row].append(newButton)
-        menuFromFile.buttons.append(newButton)
-    Menus.append(menuFromFile) 
-    return menuFromFile.buttons
-
-#Reads a json file from project root and creates menus 
-def importMenusFromFile():
-    menusFromFile =[]
-    with open('./apps.json', 'r') as apps:
-        data = json.load(apps)
-    for menu in data:
-        importApps(menu)
-        menusFromFile.append(menu)
-    #takes list of strings from file 
-    return importSideMenu(menusFromFile)
-    
-#Displays the App Menu on the right of screen when the sideMenu button is highlighted. Want to remove the need for Menus instead rely on activeMenus
-def processSideMenuSelect():
-    for button in activeMenus[0].buttons:
-        if button.isSelected:
-            activeMenus[1] = next(( menu for menu in Menus if menu.name == button.buttonText), None)
-
 #Not using this function may implment as feature
 def play_music():
-    Music_Switch = not guiobjects.Music_Switch
+    Music_Switch = not Music_Switch
     mixer = pygame.mixer
     mixer.init()
     mixer.music.load("./Sound/Music/space-trip.mp3")
@@ -106,6 +26,10 @@ def play_music():
 
 #Displays Menus and the buttons on those menus
 def updateMenus():
+    
+    for button in sideMenu.menu.buttons:
+        if button.isSelected:
+            activeMenus[1] = next(( menu for menu in sideMenu.sideMenus if menu.name == button.buttonText), None)
     for menu in activeMenus:
         if menu.name == "addAppMenu" and menu.isSelected:
             menu.hide = False
@@ -117,7 +41,7 @@ def updateMenus():
 #Creates the game loop to update the screen
 def updateCanvas():
     while True:
-        processSideMenuSelect()
+        #processSideMenuSelect()
         Canvas.blit(background_img, dest = background_position) 
         selection.moveSelection()
         updateMenus()
@@ -126,9 +50,11 @@ def updateCanvas():
 
 #Initalize and run
 if __name__ == "__main__":
-    activeMenus[0] = importMenusFromFile() #First Menu in activeMenus is SideMenu 
-    for menu in Menus:
-        print(menu.name)
+    defaultMenu = Menu(Canvas.get_width() * .19, 0, Canvas.get_width(), Canvas.get_height(),'defaultMenu')
+    addAppMenu = AddAppMenu(Canvas.get_width() *.19, 0, Canvas.get_width(), Canvas.get_height()).menu
+    sideMenu = SideMenu(0, 20, 300, Canvas.get_height() -40)
+    sideMenu.importMenusFromFile()
+    activeMenus = [sideMenu.menu, sideMenu.sideMenus[0], addAppMenu] 
     selection = Selection(activeMenus)
     updateCanvas()
     pygame.quit()

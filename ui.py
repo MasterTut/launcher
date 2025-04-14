@@ -145,6 +145,7 @@ class Selection:
         self.selectionRect = pygame.Rect(self.x, self.y, self.width, self.height) 
         self.surface.fill((100, 100, 100))
         self.isEnabled = True
+
     def deselectAllMenus(self):
         for menu in self.menus:
             if menu != self.menuSelected:
@@ -299,7 +300,7 @@ class Selection:
         if self.menuSelected.isList:
            if direction == 'RIGHT':
                 #Immedialty switch to DisplayedMenu if there are buttons  
-                if len(self.menuSelected.buttons) == 0:
+                if len(self.menuSelected.buttons) == 0 or not self.menus[1].buttons:
                     return 
                 else:
                     self.menuSelected = self.menus[1]

@@ -22,21 +22,7 @@
         }
     ],
     "Settings": [
-        {
-            "name": "defaultApp",
-            "image": "./Assets/Images/addApp.png",
-            "cmd": "echo 'fun'"
-        },
-        {
-            "name": "funtogo3",
-            "image": "./Assets/Images/addApp.png",
-            "cmd": "echo 'fun'"
-        },
-        {
-            "name": "funtogo2",
-            "image": "./Assets/Images/addApp.png",
-            "cmd": "echo 'fun'"
-        }
+
     ]
 
 }
