@@ -1,5 +1,5 @@
 {
-    "apps": [
+    "Apps": [
         {
             "name": "AddApp",
             "image": "./Assets/Images/netflix.jpg",
@@ -21,7 +21,7 @@
             "cmd": "echo 'fun'"
         }
     ],
-    "Settings": [
+    "Games": [
 
     ]
 
