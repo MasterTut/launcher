@@ -87,7 +87,6 @@ class Menu:
         self.menuRect = self.surface.get_rect()
         self.buttons = []
         self.button_matrix = [[]]
-        #self.is_form = False
         self.hide = False
         self.isList = False
         self.bg_color = (0,0,25,100)
@@ -133,7 +132,7 @@ class Menu:
 
     def displayNestedMenus(self) -> None:
         """Set and display the active nested menu based on the selected button."""
-        if not self.buttons:
+        if not self.buttons and not self.input_boxes:
             return
         for button in self.buttons:
             if button.isSelected:
@@ -141,6 +140,9 @@ class Menu:
                 if self.activeNestedMenu:
                     self.activeNestedMenu.display()
                 break
+        # If no button is selected, display activeNestedMenu if set
+        if self.activeNestedMenu and not any(button.isSelected for button in self.buttons):
+            self.activeNestedMenu.display() 
 
     def displayButtons(self) -> None:
         for button in self.buttons:
@@ -156,8 +158,9 @@ class Menu:
         pygame.draw.rect(self.surface, self.bg_color, (0, 0, self.width, self.height), border_radius=self.radius)
         self.displayButtons()
         self.displayFields()
-        self.displayNestedMenus()
         Canvas.blit(self.surface, (self.x, self.y))
+        self.displayNestedMenus()
+        
             
     def toggleDisplay(self) -> None:
         self.hide = not self.hide
@@ -256,7 +259,8 @@ class Selection:
                     if event.key == pygame.K_DOWN:
                         self.move(Direction.DOWN)
                     if event.key == pygame.K_RETURN:
-                        self.buttonSelected.onclickFunction()
+                        if self.buttonSelected:
+                            self.buttonSelected.onclickFunction()
                     if event.key == pygame.K_TAB and len(self.menuSelected.input_boxes) > 0:
                         self.selectInputBox("DOWN")
                     elif event.key == pygame.K_BACKSPACE and len(self.menuSelected.input_boxes) > 0:
@@ -358,7 +362,8 @@ class Selection:
                     (button for button in self.menuSelected.buttons if button.isSelected), 
                     self.menuSelected.buttons[0]
                 )
-                self.buttonSelected.isSelected = True
+                if self.buttonSelected:
+                    self.buttonSelected.isSelected = True
                 return
             else:
                 return
