@@ -1,8 +1,8 @@
 {
-    "apps": [
+    "Apps": [
         {
             "name": "AddApp",
-            "image": "./Assets/Images/netflix-logo-icon.svg",
+            "image": "./Assets/Images/netflix.jpg",
             "cmd": "librewolf"
         },
         {
@@ -21,22 +21,8 @@
             "cmd": "echo 'fun'"
         }
     ],
-    "Settings": [
-        {
-            "name": "defaultApp",
-            "image": "./Assets/Images/addApp.png",
-            "cmd": "echo 'fun'"
-        },
-        {
-            "name": "funtogo3",
-            "image": "./Assets/Images/addApp.png",
-            "cmd": "echo 'fun'"
-        },
-        {
-            "name": "funtogo2",
-            "image": "./Assets/Images/addApp.png",
-            "cmd": "echo 'fun'"
-        }
+    "Games": [
+
     ]
 
 }
