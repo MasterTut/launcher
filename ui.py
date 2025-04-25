@@ -37,7 +37,7 @@ class Button:
           self.buttonText = buttonText
           self.isImage = False
           self.buttonImage = pygame.image.load(TEST_BUTTON_IMAGE)
-          self.layer = surface # Will be set to menu.surface  
+          self.window_surface = surface # Will be set to menu.surface  
           self.cmd = "echo " + self.buttonText
           self.isSelected = False
           self.fillColors = { 'normal' : '#ffffff', 'hover' : '#666666',  'pressed' : '#333333', }
@@ -53,29 +53,74 @@ class Button:
           subprocess.call(self.cmd, shell=True)
       def displayText(self):
         self.buttonSurface.fill((0,0,0,0))
-        self.layer.blit(self.buttonSurface, self.buttonRect)
+        self.window_surface.blit(self.buttonSurface, self.buttonRect)
         if self.isSelected:
-          self.layer.blit(self.font_rendered_highlighted, self.buttonRect)
+          self.window_surface.blit(self.font_rendered_highlighted, self.buttonRect)
         else:
-          self.layer.blit(self.font_rendered, self.buttonRect)
+          self.window_surface.blit(self.font_rendered, self.buttonRect)
       def displayImage(self):
         padding = 5
         #draw Dark_BLUE background for button
-        pygame.draw.rect(self.layer, (self.bg_color), 
+        pygame.draw.rect(self.window_surface, (self.bg_color), 
                          (self.buttonRect.x - padding, 
                           self.buttonRect.y - padding, 
                           self.buttonImage.get_width() + 2 * padding, 
                           self.buttonImage.get_height() + 2 * padding))
         if self.isSelected:
             image = pygame.transform.smoothscale(self.buttonImage, (300,300))
-            self.layer.blit(image, (self.buttonRect.x -25, self.buttonRect.y -25))
+            self.window_surface.blit(image, (self.buttonRect.x -25, self.buttonRect.y -25))
         else:
-           self.layer.blit(self.buttonImage, self.buttonRect)
+           self.window_surface.blit(self.buttonImage, self.buttonRect)
       def display(self):
         if self.isImage:
            self.displayImage()
         else:
            self.displayText()
+
+class ErrorWindow:
+    def __init__(self,x, y, message="unknown"):
+        self.x = x
+        self.y = y
+        self.width = Canvas.get_width() / 2
+        self.height = Canvas.get_height() / 2
+        self.surface = pygame.Surface((self.width,self.height), pygame.SRCALPHA)
+        self.rect = self.surface.get_rect()
+        self.button = Button(self.width -50, self.height -50, 20, 20, self.surface, buttonText="OK")  
+        self.message = message
+        self.error = False 
+        self.button.onclickFunction = self.ok_button_func
+    def display(self):
+        """Display the error window, with error""" 
+        self.message = str(self.message) if self.message is not None else "Unknown error"
+        self.surface.fill((0,0,0,100))
+        text_y = 10
+        for line in self.wrap_text(self.message):
+            text_surface = Font.render(line, True, RED)
+            self.surface.blit(text_surface, (10,text_y))
+            text_y += 30
+        self.button.display()
+        Canvas.blit(self.surface, (self.x, self.y))
+    def wrap_text(self, message):
+        """Wrap text to fit within max_width on a surface."""
+        words = message.split(' ')
+        lines = []
+        current_line = []
+        for word in words:
+            test_line = ' '.join(current_line + [word])
+            text_surface = Font.render(test_line, True, (0, 0, 0))
+            if text_surface.get_width() <= self.width -10:
+                current_line.append(word)
+            else:
+                if current_line:
+                    lines.append(' '.join(current_line))
+                current_line = [word]
+        if current_line:
+            lines.append(' '.join(current_line))
+        return lines
+    def ok_button_func(self):
+        self.button.isSelected = False
+        self.error = False 
+
 class Menu:
     def __init__(self, x, y, width, height, name='Default') -> None:
         self.name = name
@@ -97,7 +142,7 @@ class Menu:
         self.nestedMenus: List[Menu] =[] # this holds a list of nested Menus
         self.activeNestedMenu: Optional[Menu] = None
         self._nested_menu_map: dict = {} #Map Button Names to nested menus
-   
+        self.errorWindow = ErrorWindow(self.width / 2, self.height /2)
 
     def importMenuList(self, button_width: int = 150, button_height: int = 40, vertical_spacing: int = 50) -> None:
         """Create buttons from menuList for list-based menus."""
@@ -160,25 +205,11 @@ class Menu:
         self.displayFields()
         Canvas.blit(self.surface, (self.x, self.y))
         self.displayNestedMenus()
-        
+        if self.errorWindow.error:
+            self.errorWindow.display()
             
     def toggleDisplay(self) -> None:
         self.hide = not self.hide
-    
-    def showError(self, message, duration=2000):
-        message = str(message) if message is not None else "Unknown error"
-        text_surface = Font.render(message, True, RED)
-        text_rect = text_surface.get_rect(center=(self.width//2, self.height//2))
-        
-        start_time = pygame.time.get_ticks()
-        while pygame.time.get_ticks() - start_time < duration:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    return False
-            Canvas.blit(text_surface, text_rect)
-            pygame.display.flip()
-        return True
-
 
 class Direction(Enum):
     UP = "UP"
@@ -209,6 +240,8 @@ class Selection:
         if not input_boxes:
             return
         for i, box in enumerate(self.menuSelected.input_boxes):
+            if box == self.menuSelected.input_boxes[-1]:
+                self.buttonSelected = self.menuSelected.buttons[0]
             if box.isActive:
                box.isActive = False
                if direction == "UP":
@@ -216,11 +249,13 @@ class Selection:
                else:
                     next_box = self.menuSelected.input_boxes[(i + 1) % len(self.menuSelected.input_boxes)]
                next_box.isActive = True
-               print(f"Switched to {next_box.name}, isActive: {next_box.isActive}")
+        
+               #print(f"Switched to {next_box.name}, isActive: {next_box.isActive}")
                break
             # Activate the first box if none were active
             if not any(box.isActive for box in self.menuSelected.input_boxes):
                 self.menuSelected.input_boxes[0].isActive = True 
+                
     #define key mappings here
     def moveSelection(self):
         if self.isEnabled:
@@ -246,7 +281,6 @@ class Selection:
                         if input.isActive:
                             input.text += event.text
                             input.update_text()
-                
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
                         sys.exit()
@@ -262,7 +296,7 @@ class Selection:
                         if self.buttonSelected:
                             self.buttonSelected.onclickFunction()
                     if event.key == pygame.K_TAB and len(self.menuSelected.input_boxes) > 0:
-                        self.selectInputBox("DOWN")
+                        self.selectInputBox(Direction.DOWN)
                     elif event.key == pygame.K_BACKSPACE and len(self.menuSelected.input_boxes) > 0:
                         for input in self.menuSelected.input_boxes:
                             if input.isActive:
@@ -277,26 +311,32 @@ class Selection:
         # Play sound and deselect current button
         self.sound.play()
 
-        
         if direction != Direction.RIGHT and self.buttonSelected:
             self.buttonSelected.isSelected = False
-
-        # Handle input boxes
-        if self.menuSelected and self.menuSelected.input_boxes:
-            self.selectInputBox(direction.value)
-            return
-
+        
         # Check if menu is selected
         if not self.menuSelected:
             print("No menu selected")
             return
+        
+        # Handle Error  
+        if self.menuSelected.errorWindow.error:
+            self.buttonSelected = self.menuSelected.errorWindow.button
+            self.buttonSelected.isSelected = True
+
+        # Handle input boxes
+        elif self.menuSelected and self.menuSelected.input_boxes:
+            self.selectInputBox(direction.value)
+            return
 
         # Handle list menu
-        if self.menuSelected.isList:
+        elif self.menuSelected.isList:
             self._move_in_list_menu(direction)
         # Handle grid menu
         else:
             self._move_in_grid_menu(direction)
+        
+
 
     def _move_in_list_menu(self, direction: Direction) -> None:
         """Handle navigation in a list menu."""
@@ -385,6 +425,9 @@ class Selection:
             self.buttonSelected = None
         if self.buttonSelected:
             self.buttonSelected.isSelected = True
+    def _select_error_window(self) -> None:
+       pass 
+
                         
 
 

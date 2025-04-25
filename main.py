@@ -16,9 +16,8 @@ def play_music():
     #elif not Music_Switch:
     #    mixer.music.stop()
 
-#Displays Menus and the buttons on those menus
 def updateMenus():
-    sideMenu.menu.surface.set_alpha(255)
+    """Displays Menus and the buttons on those menus"""
     sideMenu.menu.display()
 
 #Creates the game loop to update the screen
@@ -32,10 +31,11 @@ def updateCanvas():
 
 #Initalize and run
 if __name__ == "__main__":
+
     defaultMenu = Menu(Canvas.get_width() * .19, 0, Canvas.get_width(), Canvas.get_height() -40,'defaultMenu')
     sideMenu = SideMenu(0, 20, 300, Canvas.get_height() -40)
     sideMenu.importMenusFromFile()
-    
+    errorWindow = ErrorWindow(200, 100, ) 
     selection = Selection(sideMenu.menu)
     updateCanvas()
     pygame.quit()
